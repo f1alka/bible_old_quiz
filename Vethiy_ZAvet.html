@@ -1,0 +1,836 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101b2b"><title>Ветхий Завет — тренажёр памяти</title>
+<style>
+:root{--bg:#0b1220;--panel:#121e30;--text:#f3f6fb;--muted:#aab7c9;--gold:#e6bd70;--green:#49c58b;--red:#ff7777;--blue:#6fb3ff;--line:#2a3a51}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:radial-gradient(ellipse at top,#1b2d45 0,#0b1220 55%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh;overscroll-behavior-y:contain}
+.wrap{max-width:960px;margin:auto;padding:24px 16px 50px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
+.brand{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:800}
+h1{font-size:clamp(28px,5vw,44px);line-height:1.08;margin:8px 0}
+.sub{color:var(--muted);max-width:700px}
+.pill{border:1px solid #52627a;border-radius:999px;padding:6px 11px;color:#d9e3f1;font-size:12px;white-space:nowrap}
+.card{background:linear-gradient(145deg,rgba(24,39,60,.97),rgba(16,28,44,.97));border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 18px 60px #0005}
+.setup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:22px 0}
+label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+select{width:100%;background:#0d1828;color:var(--text);border:1px solid var(--line);padding:12px;border-radius:12px;font-size:16px;min-height:48px}
+button{font:inherit;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+.primary,.secondary{border:0;border-radius:13px;padding:13px 18px;font-weight:750;min-height:48px}
+.primary{background:var(--gold);color:#172033}.primary:hover{filter:brightness(1.07)}
+.primary:active{transform:scale(.98)}
+.secondary{background:#243750;color:var(--text);border:1px solid #40536c}
+.secondary:active{transform:scale(.98)}
+.startrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.small{font-size:13px;color:var(--muted)}
+.stats{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px;margin-bottom:10px}
+.track{height:7px;background:#29384d;border-radius:20px;overflow:hidden;margin-bottom:24px}
+.fill{height:100%;width:0;background:var(--gold);transition:width .25s}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.tag{font-size:12px;color:var(--gold);background:#473a24;border:1px solid #76603a;padding:4px 9px;border-radius:999px}
+.tag.blue{color:var(--blue);background:#1c2d44;border-color:#3c5a80}
+.qnum{color:var(--muted);font-size:13px;margin-bottom:8px}
+.question{font-size:clamp(21px,3.7vw,29px);font-weight:750;line-height:1.25;margin:0 0 22px}
+.answers{display:grid;gap:11px}
+.answer{width:100%;text-align:left;display:flex;gap:12px;align-items:flex-start;background:#0e1a2b;border:1px solid #31445d;color:var(--text);border-radius:14px;padding:14px;transition:.15s;min-height:56px;font-size:15px;font-family:inherit}
+.answer:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
+.answer:active:not(:disabled){transform:scale(.99)}
+.letter{flex:0 0 27px;height:27px;border-radius:8px;background:#263950;display:grid;place-items:center;font-weight:800;color:#dce5f2}
+.answer.correct{border-color:var(--green);background:#12372e}.answer.correct .letter{background:var(--green);color:#09251b}
+.answer.wrong{border-color:var(--red);background:#3c2028}.answer.wrong .letter{background:var(--red);color:#301018}
+.answer:disabled{cursor:default;opacity:1}
+.feedback{margin-top:16px;border-radius:14px;padding:14px;background:#0d1828;border:1px solid var(--line);font-size:15px;line-height:1.45}
+.feedback.good{border-color:#267b5a}.feedback.bad{border-color:#8a444a}.feedback strong{display:block;margin-bottom:4px}
+.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
+.hidden{display:none!important}.result{text-align:center}.score{font-size:58px;font-weight:850;color:var(--gold);line-height:1.1;margin:12px}
+.booklist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:18px}
+.book{background:#0e1a2b;border:1px solid var(--line);padding:8px 10px;border-radius:9px;font-size:12px;color:#dbe4ef;display:flex;justify-content:space-between;gap:6px}
+.book .bar{font-size:10px;color:var(--muted)}
+.notice{border-left:3px solid var(--gold);padding:10px 13px;background:#2b271e;color:#e9dfc9;border-radius:0 10px 10px 0;font-size:13px;margin:18px 0}
+.progress-panel{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
+.stat-box{background:#0e1a2b;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+.stat-box .num{font-size:22px;font-weight:850;color:var(--gold)}.stat-box .lbl{font-size:11px;color:var(--muted);margin-top:2px}
+.chart{display:flex;gap:4px;height:60px;align-items:flex-end;margin-top:10px;padding-bottom:20px}
+.chart-bar{flex:1;background:#2a3a51;border-radius:4px 4px 0 0;position:relative;min-height:4px}
+.chart-bar .inner{position:absolute;bottom:0;left:0;right:0;background:var(--green);border-radius:4px 4px 0 0}
+.chart-bar .lbl{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
+.history-item{background:#0e1a2b;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
+.history-item .date{color:var(--muted);font-size:11px}
+.badge{display:inline-block;background:#1c2d44;color:var(--blue);border:1px solid #3c5a80;border-radius:6px;padding:2px 7px;font-size:11px;margin-left:4px}
+.book-filter{display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow-y:auto;padding:8px;background:#0d1828;border:1px solid var(--line);border-radius:12px;-webkit-overflow-scrolling:touch}
+.book-chip{background:#1a2a40;border:1px solid #31445d;color:var(--text);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;transition:.15s;font-weight:500;min-height:38px}
+.book-chip:hover{border-color:var(--gold)}
+.book-chip.selected{background:var(--gold);color:#172033;border-color:var(--gold);font-weight:800}
+.mini-btn{background:#243750;color:var(--text);border:1px solid #40536c;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;margin-right:6px;margin-top:6px;min-height:38px}
+.mini-btn:hover{border-color:var(--gold)}
+/* Matching */
+.match-wrap{margin-top:8px}
+.match-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.match-col{display:flex;flex-direction:column;gap:7px}
+.match-col-header{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;font-weight:700}
+.match-item{background:#0e1a2b;border:1px solid #31445d;color:var(--text);border-radius:10px;padding:12px 14px;text-align:left;cursor:pointer;transition:.15s;font-size:14px;line-height:1.35;font-family:inherit;min-height:48px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
+.match-item:hover:not(.matched){border-color:var(--gold);background:#142238}
+.match-item.selected{border-color:var(--gold);background:#2a3a51;box-shadow:0 0 0 2px #e6bd7044}
+.match-item.matched{border-color:var(--green);background:#12372e;color:#bfe9d4;cursor:default;opacity:.85}
+.match-item.wrong-flash{border-color:var(--red);background:#3c2028;animation:shakeFlash .45s}
+@keyframes shakeFlash{0%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}100%{transform:translateX(0)}}
+.match-progress{margin-top:14px;height:6px;background:#29384d;border-radius:10px;overflow:hidden}
+.match-progress-fill{height:100%;background:var(--green);width:0;transition:width .3s}
+.match-status{margin-top:6px;font-size:12px;color:var(--muted);text-align:center}
+.match-hint{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;font-style:italic}
+.match-selection-bar{display:none;background:#2a3a51;border:1px solid var(--gold);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--gold);line-height:1.35}
+.match-selection-bar.active{display:block}
+.match-selection-bar strong{color:var(--text);display:block;margin-top:2px}
+
+/* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ============ */
+@media (max-width:640px){
+  body{padding-bottom:120px} /* место под фикс. панель управления */
+  .wrap{padding:14px 12px 30px}
+  header{margin-bottom:14px;gap:8px}
+  header .pill{font-size:10px;padding:5px 9px}
+  h1{font-size:26px;margin:6px 0}
+  .sub{font-size:14px}
+  .card{padding:16px 14px;border-radius:16px}
+  .notice{font-size:12.5px;padding:9px 11px;margin:12px 0}
+  .setup-grid{grid-template-columns:1fr;gap:12px;margin:16px 0}
+  .startrow{flex-direction:column;align-items:stretch}
+  .startrow .primary{width:100%;min-height:52px;font-size:16px}
+  .startrow .small{text-align:center}
+  .booklist{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+  .book{font-size:11px;padding:7px 8px}
+  .progress-panel{grid-template-columns:repeat(2,1fr);gap:8px}
+  .stat-box{padding:10px}
+  .stat-box .num{font-size:20px}
+  .stat-box .lbl{font-size:10px}
+  .chart{height:70px}
+  .history-item{padding:9px 10px;font-size:12px}
+
+  /* ИГРА — фиксированная панель управления */
+  .controls{
+    position:fixed;bottom:0;left:0;right:0;
+    background:#121e30;
+    border-top:1px solid var(--line);
+    padding:10px 12px;
+    padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
+    z-index:100;
+    margin:0;gap:8px;
+    box-shadow:0 -8px 24px #000a;
+  }
+  .controls .primary,.controls .secondary{
+    flex:1;min-height:52px;font-size:15px;padding:12px 8px;
+  }
+  /* Скрываем панель, когда игра не активна (она внутри #game.hidden) — уже работает автоматически */
+
+  /* Карточка игры — компактнее */
+  #game.card{padding:14px 12px 20px}
+  .stats{font-size:12px;margin-bottom:8px}
+  .track{margin-bottom:16px;height:6px}
+  .meta{gap:6px;margin-bottom:10px}
+  .tag{font-size:11px;padding:3px 8px}
+  .qnum{font-size:11px;margin-bottom:6px;letter-spacing:.05em}
+  .question{font-size:19px;line-height:1.3;margin-bottom:16px}
+  .answers{gap:9px}
+  .answer{padding:13px 12px;font-size:14.5px;min-height:56px;gap:10px}
+  .letter{flex:0 0 26px;height:26px;font-size:14px}
+  .feedback{padding:12px;font-size:14px;margin-top:12px}
+  .controls{margin-top:0}
+
+  /* Сопоставление — вертикальная раскладка */
+  .match-columns{grid-template-columns:1fr;gap:14px}
+  .match-col{gap:8px}
+  .match-col-header{font-size:10px;margin-top:4px}
+  .match-item{padding:12px 14px;font-size:14px;min-height:52px;line-height:1.4}
+  .match-selection-bar{
+    position:sticky;top:0;z-index:10;
+    background:#2a3a51;padding:10px 12px;
+    margin:-4px 0 10px 0;
+    box-shadow:0 4px 14px #0008;
+    border-radius:10px;
+  }
+  .match-hint{font-size:11.5px;margin-top:12px}
+
+  /* Результат */
+  .result .score{font-size:44px;margin:10px}
+  .result .startrow{flex-direction:column;gap:8px}
+  .result .startrow .primary,.result .startrow .secondary{width:100%}
+
+  /* Прогресс-панель и кнопка сброса */
+  #resetProgress{width:100%}
+
+  /* Скрываем длинное описание вверху на очень маленьких экранах? Нет — пусть будет */
+}
+
+@media (max-width:360px){
+  .question{font-size:17.5px}
+  .answer{font-size:14px;padding:12px 10px}
+  .match-item{font-size:13px;padding:11px 12px}
+  .book-chip{font-size:12px;padding:7px 11px}
+}
+</style></head><body><div class="wrap">
+
+<header><div class="brand">Библейский тренажёр</div><div class="pill" id="topPill">39 книг · тест + сопоставление</div></header>
+
+<section id="intro" class="card">
+  <div class="brand">Запоминай через повторение</div>
+  <h1>Обзор Ветхого Завета</h1>
+  <p class="sub">Проверь, насколько хорошо ты запомнил авторов, цели, главные темы, структуры и особенности книг. Неверные ответы подобраны максимально близко к правде — чтобы приходилось действительно думать.</p>
+  <div class="notice">Источник — презентация «Обзор Ветхого Завета» и «Тестики на пятёрочку».</div>
+
+  <h3 style="margin:6px 0 4px">📊 Твой прогресс</h3>
+  <div class="progress-panel">
+    <div class="stat-box"><div class="num" id="pTotalAns">0</div><div class="lbl">Всего ответов</div></div>
+    <div class="stat-box"><div class="num" id="pTotalCor">0</div><div class="lbl">Правильных</div></div>
+    <div class="stat-box"><div class="num" id="pAcc">—</div><div class="lbl">Точность</div></div>
+    <div class="stat-box"><div class="num" id="pRounds">0</div><div class="lbl">Раундов</div></div>
+  </div>
+  <div id="progressDetail"></div>
+  <div id="historyList"></div>
+  <div class="startrow" style="margin-top:14px"><button class="secondary" id="resetProgress">Сбросить прогресс</button></div>
+
+  <div class="setup-grid">
+    <div><label for="mode">Режим</label><select id="mode">
+      <option value="all">Все темы вперемешку</option>
+      <option value="book">Выбрать книги (можно несколько)</option>
+      <option value="match">🔗 Сопоставление (только этот тип)</option>
+      <option value="author">Автор и дата</option>
+      <option value="goal">Цели книг</option>
+      <option value="theme">Главные темы</option>
+      <option value="structure">Структура и жанр</option>
+      <option value="hard">🔥 Сложные (только дистракторы)</option>
+      <option value="mixed">Экзамен — 20 вопросов</option>
+    </select></div>
+    <div id="bookWrap" class="hidden">
+      <label>Книги (кликни, чтобы выбрать / отменить)</label>
+      <div class="book-filter" id="bookFilter"></div>
+      <div>
+        <button type="button" class="mini-btn" id="selectAllBooks">Выбрать все</button>
+        <button type="button" class="mini-btn" id="clearBooks">Сбросить</button>
+        <span class="small" id="selectedCount" style="margin-left:6px">выбрано: 0</span>
+      </div>
+    </div>
+    <div><label for="count">Количество вопросов</label><select id="count">
+      <option value="10">10 вопросов</option>
+      <option value="20" selected>20 вопросов</option>
+      <option value="all">Все доступные вопросы</option>
+    </select></div>
+    <div><label for="order">Порядок</label><select id="order">
+      <option value="random">Случайный</option>
+      <option value="sequence">По порядку презентации</option>
+    </select></div>
+  </div>
+  <div class="startrow"><button class="primary" id="start">Начать игру →</button><span class="small" id="totalLabel"></span></div>
+
+  <h3 style="margin:28px 0 4px">Все 39 книг Ветхого Завета</h3>
+  <p class="small">Список охватывает протестантский канон. Прогресс по книге показан справа.</p>
+  <div class="booklist" id="booklist"></div>
+</section>
+
+<section id="game" class="card hidden">
+  <div class="stats"><span id="progressText"></span><span id="scoreText"></span></div>
+  <div class="track"><div class="fill" id="fill"></div></div>
+  <div class="meta"><span class="tag" id="bookTag"></span><span class="tag blue" id="categoryTag"></span></div>
+  <div class="qnum" id="qnum"></div>
+  <h2 class="question" id="question"></h2>
+  <div class="answers" id="answers"></div>
+  <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+  <div class="controls"><button class="secondary" id="quit">Завершить</button><button class="primary" id="next" disabled>Следующий вопрос →</button></div>
+</section>
+
+<section id="result" class="card result hidden">
+  <div class="brand">Раунд завершён</div>
+  <h1>Результат</h1>
+  <div class="score" id="finalScore">0%</div>
+  <p id="resultText" class="sub" style="margin:0 auto 18px"></p>
+  <div class="startrow" style="justify-content:center"><button class="primary" id="again">Сыграть ещё раз</button><button class="secondary" id="home">К настройкам</button></div>
+  <div id="missed" style="text-align:left;margin-top:22px"></div>
+</section>
+
+<footer>Работает офлайн · Прогресс хранится только на этом устройстве</footer></div>
+
+<script>
+"use strict";
+
+/* ============ БАЗА ВОПРОСОВ ============ */
+const QUESTIONS = [
+{book:"Введение",category:"Введение",q:"Какие две основные причины пренебрежения Ветхим Заветом названы в курсе?",a:["Исторические причины и сложность Ветхого Завета","Отсутствие переводов и гонения на церковь","Влияние языческих культур и политические запреты","Недостаток рукописей и отсутствие пророков"],correct:0,why:"Слайд прямо называет две причины: исторические причины пренебрежения и сложность Ветхого Завета."},
+{book:"Введение",category:"Введение",q:"Какой процент всей Библии составляет Ветхий Завет?",a:["Около 74% (¾ всей Библии)","Около 50%","Около 25%","Около 90%"],correct:0,why:"В презентации указано: Ветхий Завет составляет ¾ всей Библии, это около 74%."},
+{book:"Введение",category:"Введение",q:"Какое последствие пренебрежения Ветхим Заветом названо первым у Уолтера Кайзера?",a:["Мы лишаем Библию её собственного фундамента для определения того, кем является Мессия","Мы теряем исторические сведения о древних империях","Мы не можем понять новозаветные притчи","Мы утрачиваем знание еврейского языка"],correct:0,why:"Кайзер: отвергая ВЗ как авторитетное откровение, мы лишаем Библию её собственного фундамента для определения того, кем является Мессия."},
+{book:"Введение",category:"Канон",q:"Какой собор, по популярному заблуждению, определил границы ветхозаветного канона?",a:["Ямнийский собор 90 г. по Р.Х.","Никейский собор 325 г.","Карфагенский собор 397 г.","Тридентский собор 1546 г."],correct:0,why:"Кайзер опровергает тезис о том, что Ямнийский собор (90 г.) определил канон."},
+{book:"Введение",category:"Канон",q:"Какие две книги вызывали споры на Ямнийском соборе (по Кайзеру)?",a:["Екклесиаст и Песнь Песней","Бытие и Иов","Притчи и Псалтирь","Есфирь и Даниил"],correct:0,why:"Споры возникали только о книгах Екклесиаста и Песни Песней, и то не по поводу каноничности, а по поводу их толкования."},
+{book:"Пятикнижие",category:"Введение",q:"От какого греческого слова происходит термин «Пятикнижие»?",a:["Пентатеухос (πεντάτευχος) — «пять свитков/частей»","Полиглотта — «многоязычная»","Тетраграмматон — «четырёхбуквенное имя»","Гексапла — «шестикратная»"],correct:0,why:"Термин пришёл из греч. πεντάτευχος — «книга, состоящая из пяти частей»."},
+{book:"Пятикнижие",category:"Введение",q:"Что означает еврейское слово «Тора» и от какого глагола оно происходит?",a:["«Наставление, указание» — от глагола яра («бросать, стрелять, попадать в цель»)","«Закон» — от глагола шахар («искать»)","«Свидетельство» — от глагола ана («отвечать»)","«Заповедь» — от глагола цава («приказывать»)"],correct:0,why:"«Тора» происходит от евр. глагола яра и означает инструкцию (руководство), позволяющую дойти до цели."},
+{book:"Пятикнижие",category:"Тема",q:"Какие три из пяти центральных тем Пятикнижия названы в презентации?",a:["Бог как учредитель народа, Бог действующий в истории, план спасения","Только сотворение, только закон и только пророчества","Мудрость, псалмы и пророчества","Царство, храм и священство"],correct:0,why:"Слайд 16 перечисляет: 1) Бог как учредитель народа; 2) Бог, действующий в истории; 3) План спасения; 4) Спасение как действие Бога; 5) Святость — это характер Бога."},
+{book:"Пятикнижие",category:"Автор",q:"Кому традиция приписывает авторство Пятикнижия (по Прокопенко)?",a:["Моисею, вероятно, за исключением последних стихов Второзакония о его смерти","Аврааму","Ездре","Иисусу Навину"],correct:0,why:"Прокопенко: автором всего Пятикнижия является Моисей, вероятно, за исключением последних стихов Второзакония."},
+{book:"Пятикнижие",category:"Структура",q:"Какой документ лежит в основе структуры книги Второзаконие?",a:["Форма договора сюзерена (вассала) — хеттские договоры II тыс. до н.э.","Ассирийские анналы I тыс. до н.э.","Египетские любовные песни","Вавилонский кодекс Хаммурапи"],correct:0,why:"Структура Второзакония больше соответствует хеттским договорам II тыс. до н.э."},
+{book:"Бытие",category:"Цель",q:"Какую первостепенную цель книги Бытие выделяет А. Прокопенко?",a:["Показать историю взаимоотношений Яхве с Израилем, обосновывающую Его единоличную власть над народом","Описать строительство храма в Иерусалиме","Объяснить разделение царства после Соломона","Дать правила служения левитов в скинии"],correct:0,why:"Слайд о цели Бытия называет книгу исторической преамбулой к завету Бога с Израилем."},
+{book:"Бытие",category:"Автор",q:"Что презентация говорит об авторстве книги Бытие?",a:["В самой книге автор не назван; традиции приписывают Пятикнижие Моисею","Автором прямо назван Авраам","Автором прямо назван Иосиф","Авторство однозначно приписано Иисусу Навину"],correct:0,why:"Презентация подчёркивает отсутствие прямого указания в самой книге и традиционную атрибуцию Моисею."},
+{book:"Бытие",category:"Тема",q:"Какие две большие части выделены в структуре Бытия?",a:["Первобытная история (1–11) и патриархальная история (12–50)","Исход (1–18) и закон (19–40)","Сотворение (1–2) и завоевание (3–50)","Царство (1–25) и изгнание (26–50)"],correct:0,why:"В презентации: четыре события в главах 1–11 и четыре патриарха в главах 12–50."},
+{book:"Бытие",category:"Структура",q:"Какие четыре события входят в первобытную историю Бытия (главы 1–11)?",a:["Сотворение, грехопадение, потоп, народы","Сотворение, потоп, Вавилон, Авраам","Грехопадение, потоп, Иаков, Иосиф","Сотворение, грехопадение, Авраам, Исаак"],correct:0,why:"Бытие 1–11: сотворение (1–2), грехопадение (3–5), потоп (6–9), народы (10–11)."},
+{book:"Бытие",category:"Структура",q:"Какие четыре патриарха выделены в Бытии 12–50?",a:["Авраам (12–24), Исаак (25–26), Иаков (27–36), Иосиф (37–50)","Адам, Ной, Авраам, Моисей","Авраам, Сарра, Исаак, Ревекка","Иаков, Иосиф, Ефрем, Манассия"],correct:0,why:"В презентации: четыре патриарха в главах 12–50 — Авраам, Исаак, Иаков, Иосиф."},
+{book:"Исход",category:"Тема",q:"Какие два основных события описывает книга Исход?",a:["Выход Израиля из Египта и установление союза с Богом","Завоевание Ханаана и раздел земли","Падение Иерусалима и возвращение из плена","Правление Давида и строительство храма"],correct:0,why:"В презентации названы спасение из Египта и вновь установленный союз Израиля с Богом."},
+{book:"Исход",category:"Цель",q:"Для чего Бог освобождает Израиль согласно целям книги Исход?",a:["Чтобы сделать его Своим народом и заключить с ним завет","Чтобы Израиль стал частью египетской империи","Чтобы назначить нового фараона","Чтобы народ немедленно построил царский дворец"],correct:0,why:"Цели на слайде: открыть имя и характер Бога, показать память о завете, освободить Израиль и заключить завет."},
+{book:"Исход",category:"Автор",q:"Кому презентация приписывает авторство Исхода?",a:["Моисею","Аарону","Самуилу","Ездре"],correct:0,why:"На слайде «Автор/дата» указано: автор — Моисей."},
+{book:"Исход",category:"Структура",q:"Какова структура книги Исход?",a:["Выход из Египта/избавление (1–18), заключение завета (19–24), строительство скинии (25–40)","Сотворение (1–11), патриархи (12–50)","Завоевание (1–12), раздел (13–22), сохранение (23–24)","Судьи (1–16), приложения (17–21)"],correct:0,why:"Исход: избавление (1–18), закон/завет (19–24), скиния (25–40)."},
+{book:"Левит",category:"Тема",q:"Как сформулирована центральная задача книги Левит?",a:["Научить, как поклоняться Богу, живущему среди народа, и как свято жить перед Ним","Описать исход из Египта","Рассказать о завоевании Иерихона","Объяснить падение Северного царства"],correct:0,why:"Слайды подчёркивают Божье присутствие, поклонение и святую жизнь."},
+{book:"Левит",category:"Цель",q:"Что должна обеспечить книга Левит согласно презентации?",a:["Святую жизнь Израиля в присутствии святого Бога и искупление через жертвы","Подготовку к строительству стен Иерусалима","Установление монархии","Объяснение будущего вавилонского плена"],correct:0,why:"В цели Левита включены святость, жертвенная система, прощение и отделение Израиля."},
+{book:"Левит",category:"Структура",q:"Какова структура книги Левит?",a:["Путь к Богу — жертва (1–17); ежедневная жизнь с Богом — освящение (18–27)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе поколение (26–36)","Проповеди Моисея (1–30); дополнение (31–34)"],correct:0,why:"Левит: I. Путь к Богу — жертва (1–17). II. Ежедневная жизнь с Богом — освящение (18–27)."},
+{book:"Числа",category:"Тема",q:"Почему поколение исхода не вошло в Землю Обетованную согласно книге Числа?",a:["Из-за неверия и непослушания Богу","Из-за отказа Моисея вести народ","Из-за нападения Египта","Из-за отсутствия закона"],correct:0,why:"Презентация связывает гибель поколения в пустыне с неверностью и непослушанием."},
+{book:"Числа",category:"Автор",q:"Кому приписывается авторство книги Числа?",a:["Моисею","Иисусу Навину","Давиду","Иеремии"],correct:0,why:"На слайде авторства приведена ссылка Чис. 33:2 как свидетельство записи Моисеем."},
+{book:"Числа",category:"Структура",q:"Какова структура книги Числа (по простому плану)?",a:["Первое поколение погибает в пустыне (1–25); второе поколение готовится войти в Землю (26–36)","Избавление (1–18); завет (19–24); скиния (25–40)","Первобытная история (1–11); патриархи (12–50)","Судьи (1–16); приложения (17–21)"],correct:0,why:"Простой план: I. Первое поколение погибает в пустыне (1–25). II. Второе поколение готовится войти в Землю (26–36)."},
+{book:"Второзаконие",category:"Цель",q:"Какова одна из основных целей Второзакония?",a:["Актуализировать закон и завет для нового поколения перед входом в землю","Описать сотворение мира","Рассказать о строительстве второго храма","Объяснить служение пророка Ионы"],correct:0,why:"На слайде цели: актуализация закона и призыв верно следовать завету."},
+{book:"Второзаконие",category:"Жанр",q:"В каком виде представлена книга Второзаконие согласно презентации?",a:["Как основные обращения Моисея к Израилю — прощальная речь","Как собрание царских псалмов","Как биография пророка в изгнании","Как хроника строительства стен"],correct:0,why:"Презентация описывает книгу как проповедь/прощальные обращения Моисея."},
+{book:"Второзаконие",category:"Структура",q:"Какова структура Второзакония (по Прокопенко)?",a:["1-я проповедь (прошлое, 1–4); 2-я проповедь (настоящее, 5–26); 3-я проповедь (будущее, 27–30); историческое дополнение (31–34)","Избавление (1–18); завет (19–24); скиния (25–40)","Первобытная история (1–11); патриархи (12–50)","Первое поколение (1–25); второе поколение (26–36)"],correct:0,why:"Прокопенко: 1) Первая проповедь (1–4); 2) Вторая проповедь (5–26); 3) Третья проповедь (27–30); 4) Историческое дополнение (31–34)."},
+{book:"Иисус Навин",category:"Автор",q:"Кому традиция, приведённая в презентации, приписывает книгу Иисуса Навина?",a:["Иисусу Навину","Моисею","Самуилу","Ездре"],correct:0,why:"На слайде об авторстве указано: автор — Иисус Навин; приведена иудейская традиция."},
+{book:"Иисус Навин",category:"Тема",q:"Какой основной этап истории Израиля описывает книга Иисуса Навина?",a:["Вхождение в землю и её завоевание/разделение","Исход из Египта","Строительство второго храма","Возвращение из вавилонского плена"],correct:0,why:"Разделы книги посвящены завоеванию земли и её распределению."},
+{book:"Иисус Навин",category:"Структура",q:"Какова структура книги Иисуса Навина?",a:["Вхождение в землю (1–5); завоевание (6–12); распределение (13–22); сохранение (23–24)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе поколение (26–36)","Судьи (1–16); приложения (17–21)"],correct:0,why:"Иисус Навин: 1) Вхождение (1–5); 2) Завоевание (6–12); 3) Распределение (13–22); 4) Сохранение (23–24)."},
+{book:"Судьи",category:"Автор",q:"Какой автор назван в ранней иудейской традиции как составитель книги Судей?",a:["Самуил","Давид","Соломон","Иезекииль"],correct:0,why:"Презентация приводит традицию Талмуда, приписывающую Самуилу книги Судей и Руфь."},
+{book:"Судьи",category:"Тема",q:"Какая повторяющаяся характеристика эпохи Судей подчёркивается в презентации?",a:["Каждый делал то, что ему казалось справедливым","Все цари были верны завету","Израиль жил без войн и конфликтов","Народ находился в Египте"],correct:0,why:"Эта формула из Суд. 21:25 используется при описании исторического фона книги."},
+{book:"Судьи",category:"Тема",q:"Сколько примерно лет длился период Судей?",a:["Около 390 лет","Около 40 лет","Около 70 лет","Около 1000 лет"],correct:0,why:"В презентации указано: правление судей около 390 лет."},
+{book:"Судьи",category:"Структура",q:"Какова структура книги Судей?",a:["Непослушание (1–3); истории судей (3–16); отступничество (17–21)","Вхождение (1–5); завоевание (6–12); распределение (13–22); сохранение (23–24)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)"],correct:0,why:"Судьи: I. Непослушание (1–3); II. История судей (3–16); III. Отступничество (17–21)."},
+{book:"Судьи",category:"Тема",q:"Какой цикл повторяется в книге Судей?",a:["Грех → угнетение → вопль → избавление → новый грех","Молитва → пост → праздник → жертва","Царь → храм → пророк → плен","Завет → благословение → пророчество → исполнение"],correct:0,why:"Цикл: израильтяне грешили → Бог наказывал → взывали к Богу → Бог посылал судей для избавления."},
+{book:"Руфь",category:"Цель",q:"Зачем, согласно презентации, написана книга Руфь?",a:["Показать действие Божьего провидения, заветной верности и благодати даже в тёмные времена Судей","Описать падение Ниневии","Дать правила храмовых жертв","Объяснить разделение царства"],correct:0,why:"Слайды о целях Руфи подчёркивают провидение, благодать к язычнице и происхождение Давида."},
+{book:"Руфь",category:"Тема",q:"Какое еврейское понятие названо ключевым для книги Руфь?",a:["Хэсэд — заветная, жертвенная любовь и верность","Шалом — храмовая жертва","Тора — царская власть","Геула — пророческий суд"],correct:0,why:"На слайде отмечено, что слово хэсэд встречается трижды и является ключевым."},
+{book:"Руфь",category:"Структура",q:"Какова структура книги Руфь (по Прокопенко)?",a:["Возвращение (1); жатва (2); помолвка (3); свадьба и наследник (4:1–17); родословие Давида (4:18–22)","Судьи (1–16); приложения (17–21)","Вхождение (1–5); завоевание (6–12)","Избавление (1–18); завет (19–24)"],correct:0,why:"Прокопенко: I. Возвращение 1; II. Жатва 2; III. Помолвка 3; IV. Свадьба 4:1–17; V. Родословие 4:18–22."},
+{book:"1–2 Царств",category:"Тема",q:"Какой исторический переход связан с книгами Царств (1–2 Царств)?",a:["Переход от судей к монархии: Саул, Давид и становление царской власти","Переход от плена к восстановлению храма","Переход от Моисея к завоеванию Ханаана","Переход от пророков к апостолам"],correct:0,why:"В презентации материал о ранней монархии связан с падением Саула и возвышением Давида."},
+{book:"1–2 Царств",category:"Автор",q:"Что можно сказать об авторе книг Самуила на основании презентации?",a:["В самой книге авторство не указано однозначно; приводится традиционная связь с Самуилом","Автором назван Давид в заглавии каждой главы","Автором назван Соломон","Авторство приписано Моисею"],correct:0,why:"Презентация рассматривает традиционную атрибуцию и исторический контекст ранней монархии."},
+{book:"1–2 Царств",category:"Тема",q:"Какой временной промежуток охватывают книги 1–2 Царств?",a:["1043–586 гг. до н.э.","1406–1385 гг. до н.э.","605–538 гг. до н.э.","516–445 гг. до н.э."],correct:0,why:"В презентации: монархия 1043–586 гг. до н.э."},
+{book:"3–4 Царств",category:"Цель",q:"Какой богословский акцент презентация выделяет в книгах Царств?",a:["Последствия греха и непослушания в противоположность благословениям за послушание","Романтическая любовь и брак","Премудрость повседневного труда","Спасение Ниневии"],correct:0,why:"На слайде о целях исторических книг сказано, что Царства подчёркивают последствия греха."},
+{book:"3–4 Царств",category:"Тема",q:"Что такое «богословие воздаяния» в книгах Царств?",a:["Послушание Божьим заповедям приносит благословение, а непослушание — неудачу","Бог воздаёт каждому по его социальному статусу","Бог воздаёт только в загробной жизни","Воздаяние относится только к языческим народам"],correct:0,why:"Автор оценивает каждого царя по верности Богу: послушание → благословение, непослушание → неудача."},
+{book:"3–4 Царств",category:"Автор",q:"Какая дата завершения книг Царств названа в презентации?",a:["После 561 г. до н.э. — даты последнего описанного события","После 586 г. до н.э.","После 539 г. до н.э.","После 445 г. до н.э."],correct:0,why:"Книги Царств завершены после 561 г. до н.э. — даты последнего описанного события."},
+{book:"3–4 Царств",category:"Структура",q:"Какова структура 3 Царств?",a:["Царство объединённое/Соломон (1–11); царство разделённое/много царей (12–22)","Царство разделено/падение Израиля (1–17); выживающее царство/падение Иудеи (18–25)","Вхождение (1–5); завоевание (6–12)","Избавление (1–18); завет (19–24)"],correct:0,why:"3 Царств: I. Объединённое царство (1–11); II. Разделённое царство (12–22)."},
+{book:"3–4 Царств",category:"Структура",q:"Какова структура 4 Царств?",a:["Царство разделено/падение Израиля (1–17); выживающее царство/падение Иудеи (18–25)","Объединённое царство/Соломон (1–11); разделённое (12–22)","Вхождение (1–5); завоевание (6–12)","Первое поколение (1–25); второе (26–36)"],correct:0,why:"4 Царств: I. Разделённое царство/падение Израиля (1–17); II. Выживающее царство/падение Иудеи (18–25)."},
+{book:"3–4 Царств",category:"История",q:"Назовите два катастрофических события для государственности Израиля и их даты.",a:["Падение Самарии (722 г. до н.э.) и падение Иерусалима (586 г. до н.э.)","Падение Ниневии (612) и битва при Кархемише (605)","Исход (1446) и вхождение в Ханаан (1406)","Указ Кира (538) и завершение храма (516)"],correct:0,why:"Северное царство пало в 722 г. (Самария), Южное — в 586 г. (Иерусалим)."},
+{book:"1–2 Паралипоменон",category:"Цель",q:"Для какой аудитории летописец творчески использовал прежние библейские повествования?",a:["Для нужд послепленной общины","Для египетского двора фараона","Для жителей Ниневии","Для поколения Авраама"],correct:0,why:"Презентация говорит, что летописец писал историю Божьего действия в Израиле, отвечая нуждам послепленной общины."},
+{book:"1–2 Паралипоменон",category:"Тема",q:"С какими книгами особенно полезно сопоставлять Паралипоменон согласно презентации?",a:["С книгами Самуила и Царей","С Иовом и Псалтирью","С Исаией и Иеремией","С Руфью и Есфирью"],correct:0,why:"Слайды прямо предлагают рассмотреть взаимосвязь Паралипоменон с Самуилом и Царями."},
+{book:"1–2 Паралипоменон",category:"Жанр",q:"Почему Паралипоменон называют «первым библейским комментарием»?",a:["Он творчески пересказывает и толкует книги Самуила и Царей, опуская одни эпизоды и добавляя другие","Он содержит только генеалогии","Он написан на арамейском языке","Он цитирует только Новый Завет"],correct:0,why:"Летописец творчески использовал прежние повествования, опуская, например, историю с Вирсавией."},
+{book:"Ездра",category:"Цель",q:"Какой центральный акцент связан с книгой Ездры в презентации?",a:["Возвращение из плена и восстановление общины, включая храм и жизнь по Закону","Завоевание Ханаана","Исход из Египта","Пророчество о падении Ниневии"],correct:0,why:"Раздел Ездры и Неемии посвящён возвращению и восстановлению после плена."},
+{book:"Неемия",category:"Тема",q:"Какое дело связано с Неемией в презентации?",a:["Восстановление стен Иерусалима и упорядочение жизни общины","Строительство ковчега","Возведение скинии в пустыне","Постройка Вавилонской башни"],correct:0,why:"В структуре Неемии и историческом контексте центрально восстановление Иерусалима."},
+{book:"Ездра",category:"История",q:"В каком году был указ Кира, разрешивший возвращение иудеев?",a:["538 г. до н.э.","586 г. до н.э.","516 г. до н.э.","445 г. до н.э."],correct:0,why:"Указ Кира — около 538 г. до н.э. (Прокопенко: ориентир 536 г., 70 лет плена от 605 до 536)."},
+{book:"Ездра",category:"Структура",q:"Какова структура книги Ездры?",a:["Возвращение и восстановление под руководством Зоровавеля (1–6); возвращение и реформа под руководством Ездры (7–10)","Восстановление стен (1–7); возрождение народа (8–10); укрепление (11–13)","Царство объединённое (1–11); разделённое (12–22)","Вхождение (1–5); завоевание (6–12)"],correct:0,why:"Ездра: I. Возвращение при Зоровавеле (1–6). II. Реформа Ездры (7–10)."},
+{book:"Неемия",category:"Структура",q:"Какова структура книги Неемии?",a:["Восстановление стен (1–7); возрождение народа при Ездре (8–10); укрепление работы (11–13)","Возвращение и восстановление при Зоровавеле (1–6); реформа Ездры (7–10)","Царство объединённое (1–11); разделённое (12–22)","Первое поколение (1–25); второе (26–36)"],correct:0,why:"Неемия: I. Восстановление стен (1–7); II. Возрождение (8–10); III. Укрепление (11–13)."},
+{book:"Ездра",category:"Тема",q:"В какой главе книги Неемии находится публичное чтение закона Ездрой и в чём особенность этой проповеди?",a:["Глава 8: читали внятно, присоединяли толкование, и народ понимал прочитанное","Глава 1: молитва Неемии о стенах","Глава 13: изгнание иноплеменных жён","Глава 2: указ Артаксеркса"],correct:0,why:"Неем. 8:4–8: «…читали из книги, из закона Божия, внятно, и присоединяли толкование»."},
+{book:"Есфирь",category:"Тема",q:"Какой необычной особенностью книги Есфирь задаётся вопрос в презентации?",a:["В книге не упоминается имя Бога","В ней нет ни одного женского персонажа","Она написана стихами целиком","В ней описан исход из Египта"],correct:0,why:"Вопрос о причинах отсутствия имени Бога прямо включён в итоговый тест презентации."},
+{book:"Есфирь",category:"Цель",q:"Какой исторический праздник связан с книгой Есфирь в презентации?",a:["Пурим","Пасха","Пятидесятница","Праздник Кущей"],correct:0,why:"В списке мегиллот указано чтение Есфири на праздник Пурим."},
+{book:"Есфирь",category:"Автор",q:"Какая версия авторства книги Есфирь названа в Талмуде?",a:["«Мужи великого собрания»","Мардохей (традиционный взгляд, Раши)","Ездра или Неемия (Августин)","Моисей"],correct:0,why:"Талмуд приписывает авторство «Мужам великого собрания»."},
+{book:"Есфирь",category:"Тема",q:"Какой подход к объяснению отсутствия имени Бога в книге Есфирь предложен в презентации?",a:["Бог действует скрыто через цепочку «случайностей», оставаясь главным действующим лицом","Книга написана язычником и не содержит богословия","Имя Бога было удалено переписчиками","Бог не действует в жизни диаспоры"],correct:0,why:"Презентация подчёркивает череду «случайностей» и скрытое провидение Бога как главного действующего лица."},
+{book:"Иов",category:"Тема",q:"Какой основной вопрос рассматривает книга Иов в обзоре презентации?",a:["Страдание праведника и вопрос о Божьей справедливости (теодицея)","Завоевание Ханаана","Восстановление стен Иерусалима","Падение Северного царства"],correct:0,why:"Раздел Иова рассматривает проблему страдания и богословские вопросы, связанные с ней."},
+{book:"Иов",category:"Автор",q:"Что говорится в презентации об авторе книги Иов?",a:["Книга анонимна, автор неизвестен; есть предположение, что им мог быть сам Иов","Автор — Моисей, это бесспорно","Автор — Соломон, это бесспорно","Автор — Ездра, это бесспорно"],correct:0,why:"Книга Иова анонимна; Прокопенко предполагает, что автором мог быть сам Иов как Божий пророк."},
+{book:"Иов",category:"История",q:"К какому периоду относятся описываемые в книге Иов события?",a:["К периоду патриархов","К периоду монархии","К периоду плена","К персидскому периоду"],correct:0,why:"Признаки: продолжительность жизни Иова около 200 лет, патриархальный уклад, богатство в скоте."},
+{book:"Иов",category:"Структура",q:"Какова хиастическая структура книги Иов?",a:["A: бедствия (1–2); B: проклятие дня рождения (3); C: три цикла споров (4–27); D: премудрость (28); C′: три главные речи (29–42:6); B′: ходатайство (42:7–9); A′: процветание (42:10–17)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Вхождение (1–5); завоевание (6–12)"],correct:0,why:"Хиазм: A (1–2) → B (3) → C (4–27) → D (28) → C′ (29:1–42:6) → B′ (42:7–9) → A′ (42:10–17)."},
+{book:"Псалтирь",category:"Жанр",q:"Какой тип литературы преобладает в книге Псалтирь?",a:["Поэзия и различные виды псалмов","Историческая хроника царей","Юридический кодекс","Биографическая повесть"],correct:0,why:"Презентация выделяет жанры Псалтири, прежде всего поэтические формы и разные виды псалмов."},
+{book:"Псалтирь",category:"Цель",q:"Для чего, среди прочего, предназначены псалмы согласно обзору?",a:["Выражать молитву, поклонение и богословское осмысление отношений с Богом","Описывать только военные походы","Заменить закон Моисея","Составить перечень царей Персии"],correct:0,why:"Обзор Псалтири посвящён её богослужебной и духовной функции."},
+{book:"Псалтирь",category:"Автор",q:"Кто назван главным автором Псалтири в презентации?",a:["Давид — 73 из 150 псалмов","Моисей — 73 из 150 псалмов","Соломон — 73 из 150 псалмов","Асаф — 73 из 150 псалмов"],correct:0,why:"Давид — главный автор, 73 из 150 псалмов. Асаф — 12, сыны Кореевы — 10, Соломон — 2, Моисей — 1 (Пс. 89), анонимные — 48."},
+{book:"Псалтирь",category:"Автор",q:"Какой псалом назван самым древним и кто его автор?",a:["Псалом 89, автор — Моисей","Псалом 23, автор — Давид","Псалом 1, автор — Соломон","Псалом 150, автор — Асаф"],correct:0,why:"Наиболее древний псалом (Пс. 89), написанный Моисеем, относится к XV в. до н.э."},
+{book:"Псалтирь",category:"Структура",q:"На сколько книг делится Псалтирь и почему?",a:["На пять книг — по аналогии с Пятикнижием","На две книги — Ветхий и Новый Завет","На три книги — по числу патриархов","На четыре книги — по числу евангелистов"],correct:0,why:"Псалтирь делится на пять книг, как Пятикнижие: 1–40, 41–71, 72–88, 89–105, 106–150."},
+{book:"Псалтирь",category:"Жанр",q:"Какой жанр псалмов самый распространённый (более 60)?",a:["Плач/мольба","Хвала","Благодарение","Царские"],correct:0,why:"Плач/мольба — самый распространённый тип (более 60 псалмов)."},
+{book:"Псалтирь",category:"Жанр",q:"Что нужно учитывать при объяснении псалмов-проклятий?",a:["Мщение и воздаяние у Бога (Втор. 32:35), контекст завета, гиперболический язык и тяжесть падения Иерусалима","Что это ошибки переписчиков","Что их нужно понимать только буквально","Что они относятся только к Давиду"],correct:0,why:"Среди пунктов: «мщение и воздаяние у Бога», контекст завета, гиперболический язык, эмоциональная реакция на падение Иерусалима."},
+{book:"Псалтирь",category:"Жанр",q:"Назовите три царских/мессианских псалма, упомянутых в презентации.",a:["Пс. 2, Пс. 71 и Пс. 88","Пс. 1, Пс. 23 и Пс. 150","Пс. 50, Пс. 90 и Пс. 118","Пс. 8, Пс. 14 и Пс. 15"],correct:0,why:"В презентации прямо названы Пс. 2, Пс. 71 и Пс. 88 как царские/мессианские."},
+{book:"Притчи",category:"Тема",q:"Какую главную тему обычно раскрывает книга Притчей в презентации?",a:["Мудрость для практической жизни перед Богом","Падение Иерусалима","Исход из Египта","Восстановление храма"],correct:0,why:"Раздел Притчей рассматривает мудрость и её применение в повседневной жизни."},
+{book:"Притчи",category:"Жанр",q:"Какую ошибку часто совершают в отношении книги Притчей?",a:["Считают притчи безусловными обещаниями или повелениями, а не общими принципами","Считают их только поэзией без практического смысла","Приписывают их Моисею","Читают их только на греческом"],correct:0,why:"Притчи — не обещания и не повеления, применимые в каждом случае, а общие жизненные принципы."},
+{book:"Притчи",category:"Структура",q:"Какова структура книги Притчей (по варианту 1)?",a:["Цель притч (1:1–7); притчи Соломона сыну (1:8–9:18); притчи Соломона (10–22:16); притчи мудрого (22:17–24:34); притчи Соломона, переписанные при Езекии (25–29); притчи Агура и Лемуила (30–31:31)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Вхождение (1–5); завоевание (6–12)"],correct:0,why:"Вариант 1: I. Цель (1:1–7); II. Притчи Соломона сыну (1:8–9:18); III. Притчи Соломона (10–22:16); IV. Притчи мудрого (22:17–24:34); V. Притчи Езекии (25–29); VI. Агур и Лемуил (30–31:31)."},
+{book:"Притчи",category:"Тема",q:"Какой ключевой стих книги Притчей назван главным в презентации?",a:["Притч. 3:5–6 — «Надейся на Господа всем сердцем твоим…»","Притч. 22:6 — «Наставь юношу при начале пути его…»","Притч. 31:10 — «Кто найдёт добродетельную жену?»","Притч. 1:7 — «Начало мудрости — страх Господень»"],correct:0,why:"Прокопенко называет Притч. 3:5–6 главным отрывком, а Притч. 1:7 — началом мудрости."},
+{book:"Песнь песней",category:"Цель",q:"Как А. Прокопенко объясняет назначение Песни песней?",a:["Как наставление о любви и браке, прославляющее супружескую любовь","Как летопись царских войн","Как пророчество о разрушении храма","Как свод законов о жертвоприношениях"],correct:0,why:"На слайде сказано, что книга наставляет подрастающих детей Соломона, готовящихся к браку."},
+{book:"Песнь песней",category:"Тема",q:"Кто названы главными действующими лицами Песни песней в презентации?",a:["Возлюбленная Суламита и возлюбленный Соломон","Руфь и Вооз","Есфирь и Мардохей","Иов и его друзья"],correct:0,why:"На слайде действующих лиц названы Суламита и Соломон."},
+{book:"Песнь песней",category:"Автор",q:"Какой аргумент в пользу авторства Соломона приведён в презентации?",a:["Соломон несколько раз упоминается в книге как главный герой (3:7, 3:11, 8:11–12)","Книга подписана его именем в конце","Его имя зашифровано в акростихе","Он цитируется в Новом Завете как автор"],correct:0,why:"Наиболее вероятный автор — Соломон, который несколько раз упоминается в ней как главный герой."},
+{book:"Екклесиаст",category:"Цель",q:"К какому итоговому выводу призывает Екклесиаст в приведённом ключевом тексте?",a:["Бояться Бога и соблюдать Его заповеди","Строить храм прежде всего для собственной славы","Искать мудрость только у царей","Покидать землю обетованную"],correct:0,why:"Приведён Еккл. 12:13–14: бойся Бога и заповеди Его соблюдай."},
+{book:"Екклесиаст",category:"Адресат",q:"Какой вывод о предполагаемой аудитории Екклесиаста делает А. Прокопенко?",a:["Книга могла быть задумана для широкой аудитории, включая язычников","Книга предназначалась только священникам Иерусалимского храма","Книга обращена исключительно к царям Северного царства","Книга адресована только изгнанникам в Вавилоне"],correct:0,why:"Обоснование в презентации — употребление общего имени Элохим и отсутствие имени Яхве."},
+{book:"Екклесиаст",category:"Структура",q:"Какова структура книги Екклесиаст?",a:["Тезис о суете (1:1–11); доказательство, что всё суета (1:12–6); совет, как жить в суете (7–12)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Вхождение (1–5); завоевание (6–12)"],correct:0,why:"План: I. Тезис (1:1–11); II. Доказательство (1:12–6); III. Совет (7–12)."},
+{book:"Исаия",category:"Тема",q:"Какой крупный тематический акцент характерен для книги Исаии в обзоре?",a:["Святость Бога, суд и надежда спасения","Только строительство стен","Только история Руфи","Только страдание Иова"],correct:0,why:"Раздел Исаии посвящён пророчествам о святости, суде и спасении."},
+{book:"Исаия",category:"Структура",q:"Какова структура книги Исаии?",a:["Божье наказание (1–39); Божье утешение (40–66)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Вхождение (1–5); завоевание (6–12)"],correct:0,why:"Исаия: I. Божье наказание (1–39); II. Божье утешение (40–66)."},
+{book:"Исаия",category:"Тема",q:"Какие главы книги Исаии чаще всего связывают с «Второисаией» в критических теориях?",a:["40–55","1–39","56–66","1–12"],correct:0,why:"Протоисаия — 1–39; Второисаия — 40–55; Тритоисаия — 56–66."},
+{book:"Иеремия",category:"Тема",q:"Какая тема проходит через книгу Иеремии согласно презентации?",a:["Божий суд над Иудеей и обещание Нового завета","Завоевание Ханаана и раздел земли","Божья милость к Ниневии","Песнь о супружеской любви"],correct:0,why:"Слайд ключевых тем прямо связывает суд над Иудеей с обещанием Нового завета (Иер. 31)."},
+{book:"Иеремия",category:"Структура",q:"Какова структура книги Иеремии (по Прокопенко)?",a:["Призыв Иеремии (1); пророчества об Иудее (2–45); пророчества о язычниках (46–51); падение Иерусалима (52)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"План: I. Призыв (1); II. Пророчества об Иудее (2–45); III. О язычниках (46–51); IV. Падение Иерусалима (52)."},
+{book:"Плач Иеремии",category:"Цель",q:"Что призвана помочь сделать книга Плач Иеремии?",a:["Осмыслить трагедию в рамках завета, выразить горе и сохранять надежду","Объяснить происхождение царской власти","Научить строительству скинии","Описать спасение Ниневии"],correct:0,why:"Все четыре пункта перечислены на слайде целей книги."},
+{book:"Плач Иеремии",category:"Тема",q:"Какой ключевой стих назван в Плаче Иеремии?",a:["Плач 3:22–23 — «Велика Твоя верность»","Плач 1:1 — «Как одиноко сидит город…»","Плач 5:21 — «Обрати нас к Себе, Господи…»","Плач 2:1 — «Как помрачил Господь во гневе Своём…»"],correct:0,why:"Плач 3:22–23 назван краткой экспозицией всей книги."},
+{book:"Иезекииль",category:"Адресат",q:"К кому обращается Иезекииль согласно презентации?",a:["К изгнанникам в Вавилонии","К израильтянам в Египте","К жителям Ниневии","К поколению, готовившемуся войти в Ханаан"],correct:0,why:"В презентации итог цели сформулирован как обращение к изгнанникам в Вавилонии."},
+{book:"Иезекииль",category:"Цель",q:"Как презентация объясняет смысл суда в книге Иезекииля?",a:["Суд — исполнение завета и путь к осознанию греха, очищению и будущему восстановлению","Суд — случайное событие, не связанное с заветом","Суд направлен только против Египта","Суд означает окончательный отказ Бога от народа"],correct:0,why:"Слайды подчёркивают верность Бога завету, педагогическую цель суда и надежду восстановления."},
+{book:"Иезекииль",category:"Структура",q:"Какова структура книги Иезекииль (по Прокопенко)?",a:["Слава Божья в суде над Израилем (1–24); в суде над другими народами (25–32); в восстановлении Израиля (33–48)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"Иезекииль: I. Суд над Израилем (1–24); II. Суд над народами (25–32); III. Восстановление (33–48)."},
+{book:"Иезекииль",category:"Тема",q:"Какие главы книги Иезекииль носят апокалиптический характер?",a:["38–39 (пророчество против Гога и Магога)","1–3 (видение славы)","36–37 (сухие кости)","40–48 (новый храм)"],correct:0,why:"Пророчества Иезекииля особенно о конце (гл. 38–39) носят апокалиптический характер."},
+{book:"Даниил",category:"Цель",q:"К чему призывает книга Даниила согласно презентации?",a:["К верности и послушанию Богу во времена трудностей","К строительству стен Иерусалима","К завоеванию Ханаана","К отказу от надежды на будущее"],correct:0,why:"Билл Арнольд: книга призывает народ Божий к верности и послушанию в трудные времена."},
+{book:"Даниил",category:"Тема",q:"Что показывает книга Даниила о ходе истории?",a:["Бог властвует над царями и империями, а Его Царство сменит земные империи","Историей полностью управляют земные цари","Империи вечны и не подлежат суду","Израиль должен стать частью Вавилона навсегда"],correct:0,why:"Это прямо сформулировано на слайде о цели книги Даниила."},
+{book:"Даниил",category:"Жанр",q:"В каком жанре написана книга Даниила?",a:["Апокалиптическая литература с элементами биографического повествования","Только историческая хроника","Только поэзия","Только юридический кодекс"],correct:0,why:"Первая половина (1–6) — биографическое повествование, вторая (7–12) — пророчества."},
+{book:"Даниил",category:"Структура",q:"Какие главы книги Даниила написаны на еврейском языке, а какие — на арамейском?",a:["Еврейский: 1:1–2:3 и 8–12; арамейский: 2:4–7:28","Еврейский: 1–12 полностью","Арамейский: 1–12 полностью","Еврейский: 1–6; арамейский: 7–12"],correct:0,why:"Еврейский: гл. 1 (1:1–2:3) и гл. 8–12; арамейский: гл. 2:4–7:28."},
+{book:"Осия",category:"Тема",q:"Какую метафору использует книга Осии для изображения отношений Бога и народа?",a:["Метафору брака","Метафору строительства города","Метафору морского путешествия","Метафору царского суда"],correct:0,why:"В целях книги прямо указана личная метафора брака."},
+{book:"Осия",category:"Цель",q:"К чему прежде всего призывает Осия?",a:["К покаянию и возвращению к верности завету","К переселению в Египет","К прекращению поклонения Богу","К строительству нового дворца"],correct:0,why:"Презентация подчёркивает последнее предупреждение Осии перед наказанием."},
+{book:"Осия",category:"Структура",q:"Какова структура книги Осии?",a:["Прелюбодейная жена и верный муж (1–3); прелюбодейный Израиль и верный Господь (4–14)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"Осия: I. Жена и муж (1–3); II. Израиль и Господь (4–14)."},
+{book:"Осия",category:"Тема",q:"Какое еврейское слово часто используется Осией и означает «верность, милость»?",a:["Хесед (חסד)","Шалом (שלום)","Эмуна (אמונה)","Тора (תורה)"],correct:0,why:"Слово хесед встречается в книге Осии 6 раз и подчёркивает нужду Израиля в верности завету."},
+{book:"Иоиль",category:"Тема",q:"Какая концепция названа главной темой книги Иоиля?",a:["День Господень","Завет с Давидом","Мудрость царя Соломона","Исход из Египта"],correct:0,why:"На слайдах темы и выводов центральной названа концепция Дня Господня."},
+{book:"Иоиль",category:"Цель",q:"Какой ответ народа на кризис призывает искать Иоиль?",a:["Подлинное покаяние, а не только обрядовые действия","Военное завоевание соседних стран","Отказ от богослужения навсегда","Переселение в Ассирию"],correct:0,why:"Слайд целей призывает к глубокому обращению и искренним отношениям с Богом."},
+{book:"Иоиль",category:"Жанр",q:"Что означает имя пророка Иоиля и какой главный образ книги?",a:["«Яхве — Бог»; нашествие саранчи и День Господень","«Голубь»; спасение язычников","«Мой вестник»; пришествие Илии","«Яхве вспомнил»; восстановление храма"],correct:0,why:"Имя Йоэл означает «Яхве — Бог»; книга строится вокруг нашествия саранчи и Дня Господня."},
+{book:"Иоиль",category:"Структура",q:"Какова структура книги Иоиля (по варианту 3)?",a:["Нашествие саранчи (1:1–20); День Господень (2:1–17); ответ Господа (2:18–3:21)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"План: I. Саранча (1:1–20); II. День Господень (2:1–17); III. Ответ Господа (2:18–3:21)."},
+{book:"Амос",category:"Тема",q:"Какую проблему в Израиле выделяет презентация как ключевую тему Амоса?",a:["Социальную несправедливость","Недостаток военных колесниц","Отсутствие царской династии Давида","Строительство второго храма"],correct:0,why:"Слайд ключевых тем: «несправедливость в Израиле»."},
+{book:"Амос",category:"Цель",q:"На какие грехи прежде всего направлено служение Амоса?",a:["На грехи Северного царства Израиля, с предупреждением о суде","На грехи Едома בלבד","На ошибки священников в послепленном Иерусалиме","На неверие поколения Моисея в пустыне"],correct:0,why:"Презентация говорит о фокусе на грехах Северного царства и грядущем суде."},
+{book:"Амос",category:"Структура",q:"Какова структура книги Амоса (по варианту 4)?",a:["Восемь пророчеств о суде (1–2); три проповеди о грехе Израиля (3–6); пять видений о наказании (7–9:10); пять обещаний о восстановлении (9:11–15)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"План: I. 8 пророчеств (1–2); II. 3 проповеди (3–6); III. 5 видений (7–9:10); IV. 5 обещаний (9:11–15)."},
+{book:"Амос",category:"Тема",q:"Говорит ли Амос о милости и надежде?",a:["Да, в 9:11–15 обещано восстановление скинии Давида и возвращение изгнанников","Нет, книга заканчивается только судом","Да, но только для языческих народов","Да, но только в первой главе"],correct:0,why:"Книга заканчивается обещанием восстановления: «В тот день Я восстановлю скинию Давидову падшую…» (9:11–15)."},
+{book:"Авдий",category:"Адресат",q:"Кто является основным адресатом книги Авдия?",a:["Едом","Египет","Вавилон","Ниневия"],correct:0,why:"Слайд исторического фона прямо указывает: основной адресат — Едом."},
+{book:"Авдий",category:"Тема",q:"За что Авдий обличает Едом?",a:["За гордыню, предательство и жестокость к Иудее во время её бедствия","За отказ строить храм","За поклонение золотому тельцу","За переселение в Египет"],correct:0,why:"Цели и ключевые темы связывают суд над Едомом с его поведением по отношению к Иудее."},
+{book:"Авдий",category:"Структура",q:"Сколько стихов в книге Авдия и какова её структура?",a:["21 стих: суд над Едомом (1–18); восстановление Израиля (19–21)","3 главы: суд, плач, надежда","5 глав: видения о Едоме","14 глав: пророчества о народах"],correct:0,why:"Авдий — самая маленькая книга (21 стих): I. Суд над Едомом (1–18); II. Восстановление Израиля (19–21)."},
+{book:"Авдий",category:"Автор",q:"Что означает имя «Авдий» и что известно о пророке?",a:["«Раб Яхве»; о нём нет дополнительной информации","«Голубь»; он был царём","«Мой вестник»; он был священником","«Яхве вспомнил»; он был книжником"],correct:0,why:"Имя «Авдий» означает «раб Яхве»; о нём не сохранилось никакой дополнительной информации."},
+{book:"Иона",category:"Жанр",q:"Чем книга Ионы отличается от большинства других малых пророков?",a:["Это повествование о переживаниях пророка, а не просто сборник пророческих речей","Это исключительно свод законов","Это собрание царских псалмов","Это генеалогическая хроника"],correct:0,why:"Презентация подчёркивает уникальный повествовательный/биографический жанр."},
+{book:"Иона",category:"Тема",q:"Какая главная тема книги Ионы названа в презентации?",a:["Спасение язычников и Божья милость к ним","Суд над Едомом","Строительство храма","Падение Иерусалима"],correct:0,why:"Слайд ключевых тем говорит о Божьей милости к Ниневии и спасении язычников."},
+{book:"Иона",category:"Жанр",q:"Почему книгу Ионы нельзя считать мифом или притчей? Назовите один аргумент.",a:["Иисус ссылается на Иону как на знамение Своего трёхдневного пребывания во гробе (Мф. 12:39)","Книга слишком короткая для притчи","В ней нет чудес","Она написана на арамейском"],correct:0,why:"Иисус называет Иону знамением (Мф. 12:39) и говорит о покаянии ниневитян как об историческом факте."},
+{book:"Иона",category:"Структура",q:"Какова структура книги Ионы?",a:["Божья милость к Ионе (1–2); Божья милость к Ниневии (3–4)","Суд над Едомом (1); восстановление Израиля (2)","Нашествие саранчи (1); День Господень (2)","Избавление (1–18); завет (19–24)"],correct:0,why:"План: I. Милость к Ионе (1–2); II. Милость к Ниневии (3–4)."},
+{book:"Михей",category:"Цель",q:"Как Мих. 6:8 формулирует, чего Бог ожидает от человека?",a:["Действовать справедливо, любить милосердие и смиренно ходить перед Богом","Приносить больше животных в жертву","Строить укреплённые города","Искать союза с сильными империями"],correct:0,why:"Эта формулировка приведена на слайде целей Михея."},
+{book:"Михей",category:"Тема",q:"Какое мессианское пророчество выделено в презентации о Михее?",a:["Рождение Владыки в Вифлееме","Рождение пророка в Ниневии","Возвращение Моисея в Египет","Постройка храма в Самарии"],correct:0,why:"Мих. 5:2 связывается с цитатой в Мф. 2:6."},
+{book:"Михей",category:"Автор",q:"Что означает имя Михей и какой литературный приём использует автор?",a:["«Кто как Яхве?»; игра слов между началом и концом книги (Мих. 1:1 и 7:18)","«Мой вестник»; акростих","«Голубь»; хиазм","«Раб Яхве»; параллелизм"],correct:0,why:"Имя Михей — «Кто как Яхве?»; в 7:18 — «Кто Бог, как Ты…» — та же игра слов."},
+{book:"Наум",category:"Тема",q:"Какова главная тема книги Наума?",a:["Суд над Ассирией и Ниневией","Восстановление стен Иерусалима","Мудрость семейной жизни","Исход Израиля из Египта"],correct:0,why:"Слайды называют суд над Ассирией/Ниневией центральной темой."},
+{book:"Наум",category:"История",q:"В каком году, согласно презентации, пала Ниневия?",a:["В 612 году до н. э.","В 586 году до н. э.","В 515 году до н. э.","В 722 году до н. э."],correct:0,why:"На слайде ключевых тем указано падение Ниневии в 612 г. до н. э."},
+{book:"Наум",category:"Жанр",q:"Какой литературный приём использует Наум, детально описывая ещё не состоявшееся падение Ниневии?",a:["Пролепсис (опережающее описание)","Акростих","Хиазм","Аллегорию"],correct:0,why:"Пролепсис — детальное изображение будущего события как уже совершающегося."},
+{book:"Аввакум",category:"Цель",q:"Какую проблему стремится объяснить книга Аввакума?",a:["Нашествие вавилонян","Исход из Египта","Падение Едома","Строительство скинии"],correct:0,why:"На слайде целей перечислены объяснение нашествия вавилонян, обличение греха и призыв уповать на Бога."},
+{book:"Аввакум",category:"Ключевой стих",q:"Какая фраза названа ключевой для книги Аввакума?",a:["Праведный верою жив будет","Бойся Бога и заповеди Его соблюдай","Я Господь, целитель твой","Господь — Пастырь мой"],correct:0,why:"Презентация выделяет Авв. 2:4: «Праведный верою жив будет»."},
+{book:"Аввакум",category:"Структура",q:"Какова структура книги Аввакума?",a:["Недоумение Аввакума (1); Божий ответ (2); хвала Аввакума (3)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"Вариант 1: I. Недоумение (1); II. Ответ (2); III. Хвала (3)."},
+{book:"Софония",category:"Тема",q:"Какая главная тема книги Софонии названа в презентации?",a:["Будущий всемирный суд — День Господень","Премудрость и семейная жизнь","Возвращение из Египта","Строительство стен Иерусалима"],correct:0,why:"Ключевая тема — День Господень и глобальный суд над народами."},
+{book:"Софония",category:"Цель",q:"К чему Софония призывает народ вместо формальной религиозности?",a:["Искать Господа, смирение и праведность","Полагаться на богатство и власть","Искать военный союз с Ассирией","Принести жертвы без покаяния"],correct:0,why:"Слайд целей противопоставляет покаяние и активный поиск Господа обрядовости."},
+{book:"Софония",category:"Структура",q:"Какова структура книги Софонии?",a:["Пророчества о суде (1–2); пророчества о будущих благословениях (3)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"План: I. Суд (1–2); II. Благословения (3)."},
+{book:"Аггей",category:"Тема",q:"Какую практическую задачу ставит перед народом книга Аггея?",a:["Возобновить строительство храма и правильно расставить приоритеты","Построить ковчег","Завоевать Ниневию","Перенести столицу в Египет"],correct:0,why:"На слайде ключевых тем указаны призыв к сооружению храма и неправильные приоритеты."},
+{book:"Аггей",category:"Исторический фон",q:"В каком году Аггей начал пророчествовать согласно презентации?",a:["Около 520 года до н. э.","Около 1406 года до н. э.","Около 586 года до н. э.","Около 612 года до н. э."],correct:0,why:"В историческом фоне книги указан 520 г. до Р. Х."},
+{book:"Аггей",category:"Структура",q:"Какова структура книги Аггея?",a:["Упрек за непослушание (1:1–11); восстановление храма (1:12–15); возвращение славы Божьей (2:1–9); религиозные вопросы (2:10–19); правление Бога (2:20–23)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"План: I. Упрек (1:1–11); II. Восстановление (1:12–15); III. Слава (2:1–9); IV. Вопросы (2:10–19); V. Правление (2:20–23)."},
+{book:"Захария",category:"Цель",q:"Какова общая цель первых восьми глав Захарии?",a:["Уверить поколение, что Бог исполнит прежние обетования и восстановит утраченное","Объяснить исход из Египта","Осудить царствование Соломона","Описать страдания Иова"],correct:0,why:"Слайд целей связывает восемь видений с обещанием восстановления после 586 г. до н. э."},
+{book:"Захария",category:"Автор",q:"Что означает имя Захария согласно презентации?",a:["«Яхве вспомнил»","«Мой вестник»","«Раб Яхве»","«Голубь»"],correct:0,why:"Значение имени указано на слайде авторства."},
+{book:"Захария",category:"Структура",q:"Какова структура книги Захарии (по Прокопенко)?",a:["Призыв к покаянию (1:1–6); 8 видений (1:7–6); 4 послания (7–8); 2 бремени (9–14)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"План: I. Покаяние (1:1–6); II. 8 видений (1:7–6); III. 4 послания (7–8); IV. 2 бремени (9–14)."},
+{book:"Малахия",category:"Цель",q:"Какую главную задачу ставит книга Малахии?",a:["Вернуть народ к заветной верности и благоговейному поклонению Богу","Призвать к завоеванию Ханаана","Научить строительству скинии","Описать разделение царства"],correct:0,why:"Цели включают подтверждение Божьей любви, верность завету и восстановление правильного поклонения."},
+{book:"Малахия",category:"Автор",q:"Что известно об авторе книги Малахии согласно презентации?",a:["Автором назван пророк Малахия; о его личности почти ничего не известно","Автором назван Моисей","Автором назван Ездра","Книга прямо объявлена анонимной и безымянной"],correct:0,why:"На слайде сказано, что автор — пророк Малахия, а имя означает «мой вестник»."},
+{book:"Малахия",category:"Структура",q:"Какова структура книги Малахии (по варианту Прокопенко)?",a:["Спор о Божьей любви (1:2–5); о славе (1:6–2:9); о неверности (2:10–16); о справедливости (2:17–3:5); о покаянии (3:6–12); о речах против Бога (3:13–4:3); призыв помнить закон (4:4); обещание об Илии (4:5–6)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе (26–36)","Божье наказание (1–39); утешение (40–66)"],correct:0,why:"План Прокопенко: 6 споров + призыв помнить закон + обещание об Илии."},
+{book:"Малахия",category:"Жанр",q:"Какой жанр характерен для книги Малахии?",a:["Пророческая дискуссия (спор-обличение)","Только поэзия","Только историческая хроника","Только апокалипсис"],correct:0,why:"Жанр — пророческая дискуссия: утверждение Бога, скептический вопрос народа и опровержение."}
+];
+
+/* ============ ВОПРОСЫ НА СОПОСТАВЛЕНИЕ ============ */
+const MATCH_QUESTIONS = [
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте книги Пятикнижия с их главными идеями",
+ leftLabel:"Книга", rightLabel:"Главная идея",
+ pairs:[
+  {left:"Бытие",right:"Происхождение мира и народа Божьего"},
+  {left:"Исход",right:"Спасение из рабства и заключение завета"},
+  {left:"Левит",right:"Святость и правильное поклонение"},
+  {left:"Числа",right:"Странствие в пустыне и неверие поколения"},
+  {left:"Второзаконие",right:"Обновление завета перед входом в землю"}
+ ],
+ why:"Бытие — происхождение; Исход — спасение и завет; Левит — святость; Числа — странствие; Второзаконие — обновление завета."},
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте исторические книги с их ключевыми персонажами",
+ leftLabel:"Книга", rightLabel:"Ключевые лица",
+ pairs:[
+  {left:"Иисус Навин",right:"Иисус Навин и Раав"},
+  {left:"Судьи",right:"Гедеон, Девора, Самсон"},
+  {left:"Руфь",right:"Руфь и Вооз"},
+  {left:"1–2 Царств",right:"Саул, Давид, Самуил"},
+  {left:"3–4 Царств",right:"Соломон, Илия, Елисей"},
+  {left:"Ездра–Неемия",right:"Зоровавель, Ездра, Неемия"}
+ ],
+ why:"Завоевание — Иисус Навин; судьи — харизматические лидеры; Руфь — моавитянка и Вооз; ранняя монархия — Саул и Давид; поздняя — Соломон и пророки; восстановление — Зоровавель, Ездра, Неемия."},
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте малых пророков с их главными темами",
+ leftLabel:"Пророк", rightLabel:"Главная тема",
+ pairs:[
+  {left:"Осия",right:"Неверность Израиля и верная любовь Бога"},
+  {left:"Иоиль",right:"День Господень и излияние Духа"},
+  {left:"Амос",right:"Социальная несправедливость и суд"},
+  {left:"Авдий",right:"Суд над Едомом за предательство"},
+  {left:"Иона",right:"Милость Божья к язычникам"},
+  {left:"Михей",right:"Справедливость, милосердие и смиренномудрие"}
+ ],
+ why:"Осия — брак как завет; Иоиль — День Господень; Амос — социальная несправедливость; Авдий — суд над Едомом; Иона — милость к язычникам; Михей — Мих. 6:8."},
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте имена пророков с их значениями",
+ leftLabel:"Имя пророка", rightLabel:"Значение имени",
+ pairs:[
+  {left:"Авдий",right:"«Раб Яхве»"},
+  {left:"Иона",right:"«Голубь»"},
+  {left:"Михей",right:"«Кто как Яхве?»"},
+  {left:"Софония",right:"«Яхве сокрыл/сохранил»"},
+  {left:"Аггей",right:"От слова «хаг» — «праздник»"},
+  {left:"Захария",right:"«Яхве вспомнил»"},
+  {left:"Малахия",right:"«Мой вестник»"}
+ ],
+ why:"Значения имён прямо указаны на слайдах о каждом пророке."},
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте пророков с их ключевыми концепциями",
+ leftLabel:"Пророк", rightLabel:"Ключевая концепция",
+ pairs:[
+  {left:"Наум",right:"Падение Ниневии (612 г. до н.э.)"},
+  {left:"Аввакум",right:"«Праведный верою жив будет»"},
+  {left:"Софония",right:"Всемирный День Господень"},
+  {left:"Аггей",right:"Призыв возобновить строительство храма"},
+  {left:"Захария",right:"Видения о восстановлении и Мессии"},
+  {left:"Малахия",right:"Пришествие вестника и День Господень"}
+ ],
+ why:"Наум — суд над Ниневией; Аввакум — вера; Софония — всемирный суд; Аггей — храм; Захария — видения; Малахия — вестник."},
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте события с их датами",
+ leftLabel:"Событие", rightLabel:"Дата",
+ pairs:[
+  {left:"Падение Самарии",right:"722 г. до н.э."},
+  {left:"Падение Иерусалима",right:"586 г. до н.э."},
+  {left:"Указ Кира о возвращении",right:"538 г. до н.э."},
+  {left:"Завершение второго храма",right:"516 г. до н.э."},
+  {left:"Возвращение Ездры в Иерусалим",right:"458 г. до н.э."},
+  {left:"Прибытие Неемии в Иерусалим",right:"445 г. до н.э."},
+  {left:"Падение Ниневии",right:"612 г. до н.э."}
+ ],
+ why:"722 — Самария; 586 — Иерусалим; 538 — указ Кира; 516 — храм; 458 — Ездра; 445 — Неемия; 612 — Ниневия."},
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте книги с их жанрами",
+ leftLabel:"Книга", rightLabel:"Жанр",
+ pairs:[
+  {left:"Псалтирь",right:"Поэзия и молитвы"},
+  {left:"Притчи",right:"Наставления мудрости"},
+  {left:"Иов",right:"Судебная драма / литература премудрости"},
+  {left:"Песнь песней",right:"Любовная поэзия"},
+  {left:"Екклесиаст",right:"Философская литература мудрости"},
+  {left:"Плач Иеремии",right:"Плач (кина)"},
+  {left:"Даниил",right:"Апокалиптическая литература"}
+ ],
+ why:"Каждая книга имеет свой жанр, подробно разобранный на слайдах."},
+{type:"match",book:"Сопоставление",category:"Сопоставление",
+ q:"Сопоставьте книги с их ключевыми стихами",
+ leftLabel:"Книга", rightLabel:"Ключевой стих",
+ pairs:[
+  {left:"Аввакум",right:"«Праведный верою жив будет» (2:4)"},
+  {left:"Михей",right:"«Действовать справедливо, любить милосердие…» (6:8)"},
+  {left:"Софония",right:"«День Господень близок» (1:14)"},
+  {left:"Екклесиаст",right:"«Бойся Бога и заповеди Его соблюдай» (12:13)"},
+  {left:"Плач Иеремии",right:"«Велика Твоя верность» (3:22–23)"}
+ ],
+ why:"Ключевые стихи каждой книги прямо названы на слайдах."}
+];
+
+QUESTIONS.push(...MATCH_QUESTIONS);
+
+const BOOKS = ["Бытие","Исход","Левит","Числа","Второзаконие","Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","1 Паралипоменон","2 Паралипоменон","Ездра","Неемия","Есфирь","Иов","Псалтирь","Притчи","Екклесиаст","Песнь песней","Исаия","Иеремия","Плач Иеремии","Иезекииль","Даниил","Осия","Иоиль","Амос","Авдий","Иона","Михей","Наум","Аввакум","Софония","Аггей","Захария","Малахия"];
+
+const $ = id => document.getElementById(id);
+const LETTERS = ["А","Б","В","Г"];
+
+/* ============ ПРОГРЕСС ============ */
+const STORAGE_KEY = "bibleQuizProgress_v3";
+let progress = loadProgress();
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return defaultProgress();
+    return Object.assign(defaultProgress(), JSON.parse(raw));
+  }catch(e){ return defaultProgress(); }
+}
+function defaultProgress(){ return { totalAnswered:0, totalCorrect:0, byBook:{}, byCategory:{}, rounds:[], streak:0, bestStreak:0 }; }
+function saveProgress(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){} }
+function recordAnswer(book, category, isCorrect){
+  progress.totalAnswered++;
+  if(isCorrect) progress.totalCorrect++;
+  if(!progress.byBook[book]) progress.byBook[book] = {a:0,c:0};
+  progress.byBook[book].a++; if(isCorrect) progress.byBook[book].c++;
+  if(!progress.byCategory[category]) progress.byCategory[category] = {a:0,c:0};
+  progress.byCategory[category].a++; if(isCorrect) progress.byCategory[category].c++;
+  if(isCorrect){ progress.streak++; if(progress.streak>progress.bestStreak) progress.bestStreak=progress.streak; }
+  else progress.streak = 0;
+  saveProgress();
+}
+function recordRound(data){
+  progress.rounds.unshift(data);
+  if(progress.rounds.length>20) progress.rounds.pop();
+  saveProgress();
+}
+
+/* ============ UI INIT ============ */
+$("booklist").innerHTML = BOOKS.map(b=>`<div class="book"><span>${b}</span><span class="bar" data-book="${b}"></span></div>`).join("");
+$("totalLabel").textContent = `Вопросов в базе: ${QUESTIONS.length} (включая ${MATCH_QUESTIONS.length} на сопоставление)`;
+
+const selectedBooks = new Set();
+function renderBookFilter(){
+  $("bookFilter").innerHTML = BOOKS.map(b=>`<button type="button" class="book-chip" data-book="${b}">${b}</button>`).join("");
+  $("bookFilter").querySelectorAll(".book-chip").forEach(el=>{
+    el.addEventListener("click", ()=>{
+      const b = el.dataset.book;
+      if(selectedBooks.has(b)) selectedBooks.delete(b);
+      else selectedBooks.add(b);
+      el.classList.toggle("selected");
+      $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
+    });
+  });
+  $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
+}
+renderBookFilter();
+$("selectAllBooks").addEventListener("click", ()=>{
+  BOOKS.forEach(b=>selectedBooks.add(b));
+  $("bookFilter").querySelectorAll(".book-chip").forEach(el=>el.classList.add("selected"));
+  $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
+});
+$("clearBooks").addEventListener("click", ()=>{
+  selectedBooks.clear();
+  $("bookFilter").querySelectorAll(".book-chip").forEach(el=>el.classList.remove("selected"));
+  $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
+});
+$("mode").addEventListener("change", ()=>{
+  $("bookWrap").classList.toggle("hidden", $("mode").value !== "book");
+});
+
+function renderProgressPanel(){
+  $("pTotalAns").textContent = progress.totalAnswered;
+  $("pTotalCor").textContent = progress.totalCorrect;
+  const acc = progress.totalAnswered ? Math.round(progress.totalCorrect/progress.totalAnswered*100) : 0;
+  $("pAcc").textContent = progress.totalAnswered ? acc+"%" : "—";
+  $("pRounds").textContent = progress.rounds.length;
+  const entries = Object.entries(progress.byBook).filter(([,v])=>v.a>0).sort((a,b)=>(b[1].c/b[1].a)-(a[1].c/a[1].a));
+  const top = entries.slice(0,12);
+  let detail = "";
+  if(top.length){
+    detail += `<h4 style="margin:6px 0">📚 По книгам / темам</h4><div class="chart">`;
+    top.forEach(([book,v])=>{
+      const pct = Math.round(v.c/v.a*100);
+      const label = book.length > 8 ? book.slice(0,7)+"…" : book;
+      detail += `<div class="chart-bar" title="${book}: ${v.c}/${v.a} (${pct}%)"><div class="inner" style="height:${pct}%"></div><div class="lbl">${label}</div></div>`;
+    });
+    detail += `</div>`;
+  } else {
+    detail = `<p class="small">Начни игру — здесь появится статистика по книгам и категориям.</p>`;
+  }
+  $("progressDetail").innerHTML = detail;
+  if(progress.rounds.length){
+    $("historyList").innerHTML = `<h4 style="margin:14px 0 6px">🕘 История раундов</h4>` +
+      progress.rounds.slice(0,5).map(r=>`<div class="history-item"><span>${r.mode} · ${r.correct}/${r.total} <span class="badge">${Math.round(r.correct/r.total*100)}%</span></span><span class="date">${new Date(r.ts).toLocaleDateString("ru-RU")}</span></div>`).join("");
+  } else {
+    $("historyList").innerHTML = "";
+  }
+  document.querySelectorAll(".bar[data-book]").forEach(el=>{
+    const b = el.dataset.book;
+    const v = progress.byBook[b];
+    if(v && v.a){ el.textContent = `${Math.round(v.c/v.a*100)}%`; el.style.color = v.c/v.a>=0.7?'#49c58b':'#e6bd70'; }
+    else el.textContent = "";
+  });
+}
+renderProgressPanel();
+
+/* ============ ИГРА ============ */
+let round = [], index = 0, correct = 0, answered = false, mistakes = [], roundMode = "";
+let matchState = null;
+const IS_MOBILE = () => window.innerWidth <= 640;
+
+function shuffle(a){ const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
+
+function bookMatches(qbook, selectedSet){
+  if(qbook === "Сопоставление") return false;
+  for(const b of selectedSet){
+    if(qbook === b) return true;
+    if((b==="1 Царств"||b==="2 Царств") && qbook==="1–2 Царств") return true;
+    if((b==="3 Царств"||b==="4 Царств") && qbook==="3–4 Царств") return true;
+    if((b==="1 Паралипоменон"||b==="2 Паралипоменон") && qbook==="1–2 Паралипоменон") return true;
+    if((b==="Ездра"||b==="Неемия") && qbook==="Ездра–Неемия") return true;
+  }
+  return false;
+}
+
+function start(){
+  let pool = [...QUESTIONS];
+  const mode = $("mode").value;
+  roundMode = $("mode").selectedOptions[0].textContent;
+  if(mode==="book"){
+    if(!selectedBooks.size){ alert("Выбери хотя бы одну книгу (или нажми «Выбрать все»)."); return; }
+    pool = pool.filter(q => bookMatches(q.book, selectedBooks));
+  }
+  if(mode==="match") pool = pool.filter(q => q.type === "match");
+  if(mode==="author") pool = pool.filter(q=> q.type !== "match" && (q.category==="Автор"||q.category==="История"));
+  if(mode==="goal") pool = pool.filter(q=> q.type !== "match" && q.category==="Цель");
+  if(mode==="theme") pool = pool.filter(q=> q.type !== "match" && (q.category==="Тема"||q.category==="Ключевой стих"));
+  if(mode==="structure") pool = pool.filter(q=> q.type !== "match" && (q.category==="Структура"||q.category==="Жанр"));
+  if(mode==="hard") pool = pool.filter(q => q.why && q.why.length > 60);
+  if(mode==="mixed") pool = shuffle(pool).slice(0,20);
+  if($("order").value==="random") pool = shuffle(pool);
+  const count = $("count").value;
+  if(mode!=="mixed" && count!=="all") pool = pool.slice(0, Number(count));
+  if(!pool.length){ alert("Для выбранного режима нет вопросов. Измени фильтры."); return; }
+  round = pool; index = 0; correct = 0; mistakes = []; matchState = null;
+  $("intro").classList.add("hidden"); $("result").classList.add("hidden"); $("game").classList.remove("hidden");
+  render();
+}
+
+function render(){
+  const q = round[index];
+  answered = false; matchState = null;
+  $("progressText").textContent = `Вопрос ${index+1} из ${round.length}`;
+  $("scoreText").textContent = `Верно: ${correct}`;
+  $("fill").style.width = `${index/round.length*100}%`;
+  $("bookTag").textContent = q.book;
+  $("categoryTag").textContent = q.category;
+  $("qnum").textContent = `ВОПРОС ${String(index+1).padStart(2,"0")}${q.type === "match" ? " · СОПОСТАВЛЕНИЕ" : ""}`;
+  $("question").textContent = q.q;
+  $("feedback").className = "feedback hidden"; $("feedback").textContent = "";
+  $("next").disabled = true;
+  $("next").textContent = index===round.length-1 ? "Показать результат" : "Следующий вопрос →";
+  // прокрутка наверх при новом вопросе
+  if(window.scrollY > 80) window.scrollTo({top: 0, behavior: 'smooth'});
+  if(q.type === "match"){
+    renderMatch(q);
+  } else {
+    const order = shuffle([0,1,2,3]);
+    const shuffledA = order.map(i=>q.a[i]);
+    const newCorrect = order.indexOf(q.correct);
+    q._shuffled = shuffledA; q._correct = newCorrect;
+    $("answers").innerHTML = shuffledA.map((a,i)=>`<button class="answer" data-i="${i}"><span class="letter">${LETTERS[i]}</span><span>${a}</span></button>`).join("");
+    $("answers").querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>choose(Number(b.dataset.i))));
+  }
+}
+
+/* ============ СОПОСТАВЛЕНИЕ ============ */
+function renderMatch(q){
+  const rightOrder = shuffle(q.pairs.map((_,i)=>i));
+  matchState = {
+    pairs: q.pairs, rightOrder,
+    matchedLeft: new Set(), matchedRight: new Set(),
+    selectedLeft: null, correctCount: 0
+  };
+  const leftHTML = q.pairs.map((p,i)=>
+    `<button type="button" class="match-item" data-side="left" data-idx="${i}">${p.left}</button>`
+  ).join("");
+  const rightHTML = rightOrder.map(i=>
+    `<button type="button" class="match-item" data-side="right" data-idx="${i}">${q.pairs[i].right}</button>`
+  ).join("");
+  $("answers").innerHTML = `
+    <div class="match-wrap">
+      <div class="match-selection-bar" id="matchSelBar"></div>
+      <div class="match-columns">
+        <div class="match-col">
+          <div class="match-col-header">${q.leftLabel || "Столбец A"}</div>
+          ${leftHTML}
+        </div>
+        <div class="match-col">
+          <div class="match-col-header">${q.rightLabel || "Столбец B"}</div>
+          ${rightHTML}
+        </div>
+      </div>
+      <div class="match-progress"><div class="match-progress-fill" id="matchFill" style="width:0%"></div></div>
+      <div class="match-status" id="matchStatus">Совпадений: 0 из ${q.pairs.length}</div>
+      <div class="match-hint">${IS_MOBILE() ? 'Выбери элемент в верхнем списке, затем пару в нижнем ↓' : 'Кликни по элементу слева, затем по соответствующему справа'}</div>
+    </div>
+  `;
+  $("answers").querySelectorAll(".match-item").forEach(el=>el.addEventListener("click", onMatchClick));
+}
+
+function updateSelectionBanner(text){
+  const bar = $("matchSelBar");
+  if(!bar) return;
+  if(text){
+    bar.classList.add("active");
+    bar.innerHTML = `Выбрано: <strong>${text}</strong><span style="color:var(--muted);font-weight:normal">↓ теперь выберите пару ниже</span>`;
+  } else {
+    bar.classList.remove("active");
+    bar.innerHTML = "";
+  }
+}
+
+function onMatchClick(e){
+  if(answered) return;
+  const el = e.currentTarget;
+  if(el.classList.contains("matched")) return;
+  const side = el.dataset.side;
+  const idx = Number(el.dataset.idx);
+
+  if(side === "left"){
+    $("answers").querySelectorAll('.match-item[data-side="left"].selected').forEach(x=>x.classList.remove("selected"));
+    el.classList.add("selected");
+    matchState.selectedLeft = idx;
+    updateSelectionBanner(matchState.pairs[idx].left);
+    return;
+  }
+
+  if(matchState.selectedLeft === null) return;
+  const leftIdx = matchState.selectedLeft;
+  if(leftIdx === idx){
+    matchState.matchedLeft.add(leftIdx);
+    matchState.matchedRight.add(idx);
+    matchState.correctCount++;
+    const leftEl = $("answers").querySelector(`.match-item[data-side="left"][data-idx="${leftIdx}"]`);
+    if(leftEl){ leftEl.classList.remove("selected"); leftEl.classList.add("matched"); }
+    el.classList.add("matched");
+    matchState.selectedLeft = null;
+    updateSelectionBanner(null);
+    const pct = Math.round(matchState.correctCount / matchState.pairs.length * 100);
+    const fill = $("matchFill"); if(fill) fill.style.width = pct+"%";
+    const st = $("matchStatus"); if(st) st.textContent = `Совпадений: ${matchState.correctCount} из ${matchState.pairs.length}`;
+    // на мобильном — прокрутить наверх, если остались пары
+    if(IS_MOBILE() && matchState.correctCount < matchState.pairs.length){
+      setTimeout(()=>{
+        const wrap = document.querySelector('.match-wrap');
+        if(wrap) wrap.scrollIntoView({behavior: 'smooth', block: 'start'});
+      }, 250);
+    }
+    if(matchState.correctCount === matchState.pairs.length) finishMatch();
+  } else {
+    el.classList.add("wrong-flash");
+    const leftEl = $("answers").querySelector(`.match-item[data-side="left"][data-idx="${leftIdx}"]`);
+    if(leftEl) leftEl.classList.add("wrong-flash");
+    setTimeout(()=>{
+      el.classList.remove("wrong-flash");
+      if(leftEl) leftEl.classList.remove("wrong-flash");
+    }, 500);
+    // вибрация на мобильном, если поддерживается
+    if(navigator.vibrate) navigator.vibrate(60);
+  }
+}
+
+function finishMatch(){
+  answered = true;
+  const q = round[index];
+  recordAnswer(q.book, q.category, true);
+  correct++;
+  const fb = $("feedback");
+  fb.classList.remove("hidden"); fb.classList.add("good");
+  fb.innerHTML = `<strong>✅ Все пары найдены верно!</strong><span>${q.why || ""}</span>`;
+  $("scoreText").textContent = `Верно: ${correct}`;
+  $("next").disabled = false;
+  if(navigator.vibrate) navigator.vibrate([40, 40, 40]);
+}
+
+/* ============ SINGLE-ANSWER ============ */
+function choose(n){
+  if(answered) return;
+  answered = true;
+  const q = round[index];
+  const good = n === q._correct;
+  recordAnswer(q.book, q.category, good);
+  if(good) correct++; else mistakes.push({q, chosen:n});
+  [...$("answers").children].forEach((b,i)=>{
+    b.disabled = true;
+    if(i===q._correct) b.classList.add("correct");
+    else if(i===n) b.classList.add("wrong");
+  });
+  const fb = $("feedback");
+  fb.classList.remove("hidden"); fb.classList.add(good?"good":"bad");
+  fb.innerHTML = `<strong>${good?"✅ Верно! Отличная работа.":"❌ Не совсем. Правильный ответ: "+LETTERS[q._correct]+"."}</strong><span>${q.why}</span>`;
+  $("scoreText").textContent = `Верно: ${correct}`;
+  $("next").disabled = false;
+  if(navigator.vibrate) navigator.vibrate(good ? 30 : [40, 40]);
+  // на мобильном — прокрутить к фидбеку
+  if(IS_MOBILE()){
+    setTimeout(()=>{ fb.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }, 100);
+  }
+}
+
+function finish(){
+  $("game").classList.add("hidden"); $("result").classList.remove("hidden");
+  const pct = Math.round(correct/round.length*100);
+  $("finalScore").textContent = `${pct}%`;
+  $("resultText").textContent = `Правильных ответов: ${correct} из ${round.length}. ${pct>=90?"Отличное знание материала!":pct>=70?"Хороший результат. Повтори вопросы с ошибками.":pct>=50?"Есть основа — закрепи слабые места и сыграй ещё раз.":"Стоит повторить презентацию и пройти раунд снова."}`;
+  $("missed").innerHTML = mistakes.length
+    ? `<h3>Что стоит повторить</h3>` + mistakes.map(m=>{
+        if(m.q.type === "match"){
+          return `<div class="feedback bad"><strong>${m.q.q}</strong><div class="small">${m.q.why || ""}</div></div>`;
+        }
+        return `<div class="feedback bad"><strong>${m.q.book}: ${m.q.q}</strong><div>Правильный ответ: ${m.q.a[m.q.correct]}</div><div class="small">${m.q.why}</div></div>`;
+      }).join("")
+    : "<h3>Без ошибок — так держать!</h3>";
+  recordRound({ts:Date.now(), mode:roundMode, total:round.length, correct});
+  renderProgressPanel();
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+$("start").addEventListener("click", start);
+$("next").addEventListener("click", ()=>{ if(index<round.length-1){ index++; render(); } else finish(); });
+$("quit").addEventListener("click", finish);
+$("again").addEventListener("click", start);
+$("home").addEventListener("click", ()=>{ $("result").classList.add("hidden"); $("intro").classList.remove("hidden"); window.scrollTo({top:0,behavior:'smooth'}); });
+$("resetProgress").addEventListener("click", ()=>{
+  if(confirm("Сбросить весь прогресс? Это действие нельзя отменить.")){
+    progress = defaultProgress(); saveProgress(); renderProgressPanel();
+  }
+});
+</script></body></html>
