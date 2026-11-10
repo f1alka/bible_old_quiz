@@ -55,6 +55,15 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
 .history-item{background:#0e1a2b;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
 .history-item .date{color:var(--muted);font-size:11px}
 .badge{display:inline-block;background:#1c2d44;color:var(--blue);border:1px solid #3c5a80;border-radius:6px;padding:2px 7px;font-size:11px;margin-left:4px}
+
+/* Категории книг */
+.cat-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.cat-btn{background:#1a2a40;border:1.5px solid #31445d;color:var(--text);border-radius:10px;padding:8px 13px;font-size:13px;cursor:pointer;transition:.15s;font-weight:600;min-height:38px;display:flex;align-items:center;gap:6px}
+.cat-btn:hover{border-color:var(--gold)}
+.cat-btn.partial{border-color:var(--gold);color:var(--gold);background:#2a2a1a}
+.cat-btn.selected{background:var(--gold);color:#172033;border-color:var(--gold)}
+.cat-btn .cnt{font-size:11px;opacity:.7;font-weight:500}
+
 .book-filter{display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow-y:auto;padding:8px;background:#0d1828;border:1px solid var(--line);border-radius:12px;-webkit-overflow-scrolling:touch}
 .book-chip{background:#1a2a40;border:1px solid #31445d;color:var(--text);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;transition:.15s;font-weight:500;min-height:38px}
 .book-chip:hover{border-color:var(--gold)}
@@ -63,6 +72,7 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
 .mini-btn:hover{border-color:var(--gold)}
 .filter-hint{font-size:12px;color:var(--muted);margin-top:6px}
 .filter-hint strong{color:var(--gold)}
+
 /* Matching */
 .match-wrap{margin-top:8px}
 .match-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -129,6 +139,7 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
   #resetProgress{width:100%}
   .book-filter{max-height:150px}
   .book-chip{font-size:12px;padding:7px 11px}
+  .cat-btn{font-size:12px;padding:7px 11px}
 }
 @media (max-width:360px){
   .question{font-size:17.5px}
@@ -143,7 +154,7 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
   <div class="brand">Запоминай через повторение</div>
   <h1>Обзор Ветхого Завета</h1>
   <p class="sub">Проверь, насколько хорошо ты запомнил авторов, цели, главные темы, структуры и особенности книг. Неверные ответы подобраны максимально близко к правде — чтобы приходилось действительно думать.</p>
-  <div class="notice">Источник — презентация «Обзор Ветхого Завета» и «Тестики на пятёрочку». Фильтр книг работает во всех режимах: выбери книги в блоке ниже — и вопросы будут браться только из них.</div>
+  <div class="notice">Источник — презентация «Обзор Ветхого Завета» и «Тестики на пятёрочку». Фильтр книг работает во всех режимах: выбери книги или целые категории — и вопросы будут браться только из них.</div>
 
   <h3 style="margin:6px 0 4px">📊 Твой прогресс</h3>
   <div class="progress-panel">
@@ -156,10 +167,11 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
   <div id="historyList"></div>
   <div class="startrow" style="margin-top:14px"><button class="secondary" id="resetProgress">Сбросить прогресс</button></div>
 
-  <!-- ФИЛЬТР КНИГ — всегда видим -->
   <div style="margin-top:26px">
     <label style="font-size:15px;color:var(--text);font-weight:700">📚 Выбрать книги (работает во всех режимах)</label>
     <p class="filter-hint">Если книги не выбраны — вопросы берутся из всех книг. Если выбраны — только из них. <strong id="selectedCount">выбрано: 0 (все книги)</strong></p>
+
+    <div class="cat-buttons" id="catButtons"></div>
     <div class="book-filter" id="bookFilter"></div>
     <div>
       <button type="button" class="mini-btn" id="selectAllBooks">Выбрать все</button>
@@ -223,7 +235,7 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
 <script>
 "use strict";
 
-/* ============ БАЗА ВОПРОСОВ (single-answer) ============ */
+/* ============ БАЗА ВОПРОСОВ ============ */
 const QUESTIONS = [
 {book:"Введение",category:"Введение",q:"Какие две основные причины пренебрежения Ветхим Заветом названы в курсе?",a:["Исторические причины и сложность Ветхого Завета","Отсутствие переводов и гонения на церковь","Влияние языческих культур и политические запреты","Недостаток рукописей и отсутствие пророков"],correct:0,why:"Слайд прямо называет две причины: исторические причины пренебрежения и сложность Ветхого Завета."},
 {book:"Введение",category:"Введение",q:"Какой процент всей Библии составляет Ветхий Завет?",a:["Около 74% (¾ всей Библии)","Около 50%","Около 25%","Около 90%"],correct:0,why:"В презентации указано: Ветхий Завет составляет ¾ всей Библии, это около 74%."},
@@ -279,7 +291,7 @@ const QUESTIONS = [
 {book:"1–2 Паралипоменон",category:"Жанр",q:"Почему Паралипоменон называют «первым библейским комментарием»?",a:["Он творчески пересказывает и толкует книги Самуила и Царей, опуская одни эпизоды и добавляя другие","Он содержит только генеалогии","Он написан на арамейском языке","Он цитирует только Новый Завет"],correct:0,why:"Летописец творчески использовал прежние повествования, опуская, например, историю с Вирсавией."},
 {book:"Ездра",category:"Цель",q:"Какой центральный акцент связан с книгой Ездры в презентации?",a:["Возвращение из плена и восстановление общины, включая храм и жизнь по Закону","Завоевание Ханаана","Исход из Египта","Пророчество о падении Ниневии"],correct:0,why:"Раздел Ездры и Неемии посвящён возвращению и восстановлению после плена."},
 {book:"Неемия",category:"Тема",q:"Какое дело связано с Неемией в презентации?",a:["Восстановление стен Иерусалима и упорядочение жизни общины","Строительство ковчега","Возведение скинии в пустыне","Постройка Вавилонской башни"],correct:0,why:"В структуре Неемии и историческом контексте центрально восстановление Иерусалима."},
-{book:"Ездра",category:"История",q:"В каком году был указ Кира, разрешивший возвращение иудеев?",a:["538 г. до н.э.","586 г. до н.э.","516 г. до н.э.","445 г. до н.э."],correct:0,why:"Указ Кира — около 538 г. до н.э. (Прокопенко: ориентир 536 г., 70 лет плена от 605 до 536)."},
+{book:"Ездра",category:"История",q:"В каком году был указ Кира, разрешивший возвращение иудеев?",a:["538 г. до н.э.","586 г. до н.э.","516 г. до н.э.","445 г. до н.э."],correct:0,why:"Указ Кира — около 538 г. до н.э."},
 {book:"Ездра",category:"Структура",q:"Какова структура книги Ездры?",a:["Возвращение и восстановление под руководством Зоровавеля (1–6); возвращение и реформа под руководством Ездры (7–10)","Восстановление стен (1–7); возрождение народа (8–10); укрепление (11–13)","Царство объединённое (1–11); разделённое (12–22)","Вхождение (1–5); завоевание (6–12)"],correct:0,why:"Ездра: I. Возвращение при Зоровавеле (1–6). II. Реформа Ездры (7–10)."},
 {book:"Неемия",category:"Структура",q:"Какова структура книги Неемии?",a:["Восстановление стен (1–7); возрождение народа при Ездре (8–10); укрепление работы (11–13)","Возвращение и восстановление при Зоровавеле (1–6); реформа Ездры (7–10)","Царство объединённое (1–11); разделённое (12–22)","Первое поколение (1–25); второе (26–36)"],correct:0,why:"Неемия: I. Восстановление стен (1–7); II. Возрождение (8–10); III. Укрепление (11–13)."},
 {book:"Ездра",category:"Тема",q:"В какой главе книги Неемии находится публичное чтение закона Ездрой и в чём особенность этой проповеди?",a:["Глава 8: читали внятно, присоединяли толкование, и народ понимал прочитанное","Глава 1: молитва Неемии о стенах","Глава 13: изгнание иноплеменных жён","Глава 2: указ Артаксеркса"],correct:0,why:"Неем. 8:4–8: «…читали из книги, из закона Божия, внятно, и присоединяли толкование»."},
@@ -297,7 +309,7 @@ const QUESTIONS = [
 {book:"Псалтирь",category:"Автор",q:"Какой псалом назван самым древним и кто его автор?",a:["Псалом 89, автор — Моисей","Псалом 23, автор — Давид","Псалом 1, автор — Соломон","Псалом 150, автор — Асаф"],correct:0,why:"Наиболее древний псалом (Пс. 89), написанный Моисеем, относится к XV в. до н.э."},
 {book:"Псалтирь",category:"Структура",q:"На сколько книг делится Псалтирь и почему?",a:["На пять книг — по аналогии с Пятикнижием","На две книги — Ветхий и Новый Завет","На три книги — по числу патриархов","На четыре книги — по числу евангелистов"],correct:0,why:"Псалтирь делится на пять книг, как Пятикнижие: 1–40, 41–71, 72–88, 89–105, 106–150."},
 {book:"Псалтирь",category:"Жанр",q:"Какой жанр псалмов самый распространённый (более 60)?",a:["Плач/мольба","Хвала","Благодарение","Царские"],correct:0,why:"Плач/мольба — самый распространённый тип (более 60 псалмов)."},
-{book:"Псалтирь",category:"Жанр",q:"Что нужно учитывать при объяснении псалмов-проклятий?",a:["Мщение и воздаяние у Бога (Втор. 32:35), контекст завета, гиперболический язык и тяжесть падения Иерусалима","Что это ошибки переписчиков","Что их нужно понимать только буквально","Что они относятся только к Давиду"],correct:0,why:"Среди пунктов: «мщение и воздаяние у Бога», контекст завета, гиперболический язык, эмоциональная реакция на падение Иерусалима."},
+{book:"Псалтирь",category:"Жанр",q:"Что нужно учитывать при объяснении псалмов-проклятий?",a:["Мщение и воздаяние у Бога (Втор. 32:35), контекст завета, гиперболический язык и тяжесть падения Иерусалима","Что это ошибки переписчиков","Что их нужно понимать только буквально","Что они относятся только к Давиду"],correct:0,why:"Среди пунктов: «мщение и воздаяние у Бога», контекст завета, гиперболический язык."},
 {book:"Псалтирь",category:"Жанр",q:"Назовите три царских/мессианских псалма, упомянутых в презентации.",a:["Пс. 2, Пс. 71 и Пс. 88","Пс. 1, Пс. 23 и Пс. 150","Пс. 50, Пс. 90 и Пс. 118","Пс. 8, Пс. 14 и Пс. 15"],correct:0,why:"В презентации прямо названы Пс. 2, Пс. 71 и Пс. 88 как царские/мессианские."},
 {book:"Притчи",category:"Тема",q:"Какую главную тему обычно раскрывает книга Притчей в презентации?",a:["Мудрость для практической жизни перед Богом","Падение Иерусалима","Исход из Египта","Восстановление храма"],correct:0,why:"Раздел Притчей рассматривает мудрость и её применение в повседневной жизни."},
 {book:"Притчи",category:"Жанр",q:"Какую ошибку часто совершают в отношении книги Притчей?",a:["Считают притчи безусловными обещаниями или повелениями, а не общими принципами","Считают их только поэзией без практического смысла","Приписывают их Моисею","Читают их только на греческом"],correct:0,why:"Притчи — не обещания и не повеления, применимые в каждом случае, а общие жизненные принципы."},
@@ -368,125 +380,53 @@ const QUESTIONS = [
 {book:"Малахия",category:"Жанр",q:"Какой жанр характерен для книги Малахии?",a:["Пророческая дискуссия (спор-обличение)","Только поэзия","Только историческая хроника","Только апокалипсис"],correct:0,why:"Жанр — пророческая дискуссия: утверждение Бога, скептический вопрос народа и опровержение."}
 ];
 
-/* ============ ВОПРОСЫ НА СОПОСТАВЛЕНИЕ ============ */
 const MATCH_QUESTIONS = [
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["Бытие","Исход","Левит","Числа","Второзаконие"],
- q:"Сопоставьте книги Пятикнижия с их главными идеями",
- leftLabel:"Книга", rightLabel:"Главная идея",
- pairs:[
-  {left:"Бытие",right:"Происхождение мира и народа Божьего"},
-  {left:"Исход",right:"Спасение из рабства и заключение завета"},
-  {left:"Левит",right:"Святость и правильное поклонение"},
-  {left:"Числа",right:"Странствие в пустыне и неверие поколения"},
-  {left:"Второзаконие",right:"Обновление завета перед входом в землю"}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["Бытие","Исход","Левит","Числа","Второзаконие"],
+ q:"Сопоставьте книги Пятикнижия с их главными идеями",leftLabel:"Книга", rightLabel:"Главная идея",
+ pairs:[{left:"Бытие",right:"Происхождение мира и народа Божьего"},{left:"Исход",right:"Спасение из рабства и заключение завета"},{left:"Левит",right:"Святость и правильное поклонение"},{left:"Числа",right:"Странствие в пустыне и неверие поколения"},{left:"Второзаконие",right:"Обновление завета перед входом в землю"}],
  why:"Бытие — происхождение; Исход — спасение и завет; Левит — святость; Числа — странствие; Второзаконие — обновление завета."},
-
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","Ездра","Неемия"],
- q:"Сопоставьте исторические книги с их ключевыми персонажами",
- leftLabel:"Книга", rightLabel:"Ключевые лица",
- pairs:[
-  {left:"Иисус Навин",right:"Иисус Навин и Раав"},
-  {left:"Судьи",right:"Гедеон, Девора, Самсон"},
-  {left:"Руфь",right:"Руфь и Вооз"},
-  {left:"1–2 Царств",right:"Саул, Давид, Самуил"},
-  {left:"3–4 Царств",right:"Соломон, Илия, Елисей"},
-  {left:"Ездра–Неемия",right:"Зоровавель, Ездра, Неемия"}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","Ездра","Неемия"],
+ q:"Сопоставьте исторические книги с их ключевыми персонажами",leftLabel:"Книга", rightLabel:"Ключевые лица",
+ pairs:[{left:"Иисус Навин",right:"Иисус Навин и Раав"},{left:"Судьи",right:"Гедеон, Девора, Самсон"},{left:"Руфь",right:"Руфь и Вооз"},{left:"1–2 Царств",right:"Саул, Давид, Самуил"},{left:"3–4 Царств",right:"Соломон, Илия, Елисей"},{left:"Ездра–Неемия",right:"Зоровавель, Ездра, Неемия"}],
  why:"Завоевание — Иисус Навин; судьи — харизматические лидеры; Руфь — моавитянка и Вооз; ранняя монархия — Саул и Давид; поздняя — Соломон и пророки; восстановление — Зоровавель, Ездра, Неемия."},
-
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["Осия","Иоиль","Амос","Авдий","Иона","Михей"],
- q:"Сопоставьте малых пророков с их главными темами",
- leftLabel:"Пророк", rightLabel:"Главная тема",
- pairs:[
-  {left:"Осия",right:"Неверность Израиля и верная любовь Бога"},
-  {left:"Иоиль",right:"День Господень и излияние Духа"},
-  {left:"Амос",right:"Социальная несправедливость и суд"},
-  {left:"Авдий",right:"Суд над Едомом за предательство"},
-  {left:"Иона",right:"Милость Божья к язычникам"},
-  {left:"Михей",right:"Справедливость, милосердие и смиренномудрие"}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["Осия","Иоиль","Амос","Авдий","Иона","Михей"],
+ q:"Сопоставьте малых пророков с их главными темами",leftLabel:"Пророк", rightLabel:"Главная тема",
+ pairs:[{left:"Осия",right:"Неверность Израиля и верная любовь Бога"},{left:"Иоиль",right:"День Господень и излияние Духа"},{left:"Амос",right:"Социальная несправедливость и суд"},{left:"Авдий",right:"Суд над Едомом за предательство"},{left:"Иона",right:"Милость Божья к язычникам"},{left:"Михей",right:"Справедливость, милосердие и смиренномудрие"}],
  why:"Осия — брак как завет; Иоиль — День Господень; Амос — социальная несправедливость; Авдий — суд над Едомом; Иона — милость к язычникам; Михей — Мих. 6:8."},
-
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["Авдий","Иона","Михей","Софония","Аггей","Захария","Малахия"],
- q:"Сопоставьте имена пророков с их значениями",
- leftLabel:"Имя пророка", rightLabel:"Значение имени",
- pairs:[
-  {left:"Авдий",right:"«Раб Яхве»"},
-  {left:"Иона",right:"«Голубь»"},
-  {left:"Михей",right:"«Кто как Яхве?»"},
-  {left:"Софония",right:"«Яхве сокрыл/сохранил»"},
-  {left:"Аггей",right:"От слова «хаг» — «праздник»"},
-  {left:"Захария",right:"«Яхве вспомнил»"},
-  {left:"Малахия",right:"«Мой вестник»"}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["Авдий","Иона","Михей","Софония","Аггей","Захария","Малахия"],
+ q:"Сопоставьте имена пророков с их значениями",leftLabel:"Имя пророка", rightLabel:"Значение имени",
+ pairs:[{left:"Авдий",right:"«Раб Яхве»"},{left:"Иона",right:"«Голубь»"},{left:"Михей",right:"«Кто как Яхве?»"},{left:"Софония",right:"«Яхве сокрыл/сохранил»"},{left:"Аггей",right:"От слова «хаг» — «праздник»"},{left:"Захария",right:"«Яхве вспомнил»"},{left:"Малахия",right:"«Мой вестник»"}],
  why:"Значения имён прямо указаны на слайдах о каждом пророке."},
-
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["Наум","Аввакум","Софония","Аггей","Захария","Малахия"],
- q:"Сопоставьте пророков с их ключевыми концепциями",
- leftLabel:"Пророк", rightLabel:"Ключевая концепция",
- pairs:[
-  {left:"Наум",right:"Падение Ниневии (612 г. до н.э.)"},
-  {left:"Аввакум",right:"«Праведный верою жив будет»"},
-  {left:"Софония",right:"Всемирный День Господень"},
-  {left:"Аггей",right:"Призыв возобновить строительство храма"},
-  {left:"Захария",right:"Видения о восстановлении и Мессии"},
-  {left:"Малахия",right:"Пришествие вестника и День Господень"}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["Наум","Аввакум","Софония","Аггей","Захария","Малахия"],
+ q:"Сопоставьте пророков с их ключевыми концепциями",leftLabel:"Пророк", rightLabel:"Ключевая концепция",
+ pairs:[{left:"Наум",right:"Падение Ниневии (612 г. до н.э.)"},{left:"Аввакум",right:"«Праведный верою жив будет»"},{left:"Софония",right:"Всемирный День Господень"},{left:"Аггей",right:"Призыв возобновить строительство храма"},{left:"Захария",right:"Видения о восстановлении и Мессии"},{left:"Малахия",right:"Пришествие вестника и День Господень"}],
  why:"Наум — суд над Ниневией; Аввакум — вера; Софония — всемирный суд; Аггей — храм; Захария — видения; Малахия — вестник."},
-
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["4 Царств","Иеремия","Ездра","Неемия","Аггей","Наум","Софония"],
- q:"Сопоставьте события с их датами",
- leftLabel:"Событие", rightLabel:"Дата",
- pairs:[
-  {left:"Падение Самарии",right:"722 г. до н.э."},
-  {left:"Падение Иерусалима",right:"586 г. до н.э."},
-  {left:"Указ Кира о возвращении",right:"538 г. до н.э."},
-  {left:"Завершение второго храма",right:"516 г. до н.э."},
-  {left:"Возвращение Ездры в Иерусалим",right:"458 г. до н.э."},
-  {left:"Прибытие Неемии в Иерусалим",right:"445 г. до н.э."},
-  {left:"Падение Ниневии",right:"612 г. до н.э."}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["4 Царств","Иеремия","Ездра","Неемия","Аггей","Наум","Софония"],
+ q:"Сопоставьте события с их датами",leftLabel:"Событие", rightLabel:"Дата",
+ pairs:[{left:"Падение Самарии",right:"722 г. до н.э."},{left:"Падение Иерусалима",right:"586 г. до н.э."},{left:"Указ Кира о возвращении",right:"538 г. до н.э."},{left:"Завершение второго храма",right:"516 г. до н.э."},{left:"Возвращение Ездры в Иерусалим",right:"458 г. до н.э."},{left:"Прибытие Неемии в Иерусалим",right:"445 г. до н.э."},{left:"Падение Ниневии",right:"612 г. до н.э."}],
  why:"722 — Самария; 586 — Иерусалим; 538 — указ Кира; 516 — храм; 458 — Ездра; 445 — Неемия; 612 — Ниневия."},
-
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["Псалтирь","Притчи","Иов","Песнь песней","Екклесиаст","Плач Иеремии","Даниил"],
- q:"Сопоставьте книги с их жанрами",
- leftLabel:"Книга", rightLabel:"Жанр",
- pairs:[
-  {left:"Псалтирь",right:"Поэзия и молитвы"},
-  {left:"Притчи",right:"Наставления мудрости"},
-  {left:"Иов",right:"Судебная драма / литература премудрости"},
-  {left:"Песнь песней",right:"Любовная поэзия"},
-  {left:"Екклесиаст",right:"Философская литература мудрости"},
-  {left:"Плач Иеремии",right:"Плач (кина)"},
-  {left:"Даниил",right:"Апокалиптическая литература"}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["Псалтирь","Притчи","Иов","Песнь песней","Екклесиаст","Плач Иеремии","Даниил"],
+ q:"Сопоставьте книги с их жанрами",leftLabel:"Книга", rightLabel:"Жанр",
+ pairs:[{left:"Псалтирь",right:"Поэзия и молитвы"},{left:"Притчи",right:"Наставления мудрости"},{left:"Иов",right:"Судебная драма / литература премудрости"},{left:"Песнь песней",right:"Любовная поэзия"},{left:"Екклесиаст",right:"Философская литература мудрости"},{left:"Плач Иеремии",right:"Плач (кина)"},{left:"Даниил",right:"Апокалиптическая литература"}],
  why:"Каждая книга имеет свой жанр, подробно разобранный на слайдах."},
-
-{type:"match",book:"Сопоставление",category:"Сопоставление",
- books:["Аввакум","Михей","Софония","Екклесиаст","Плач Иеремии"],
- q:"Сопоставьте книги с их ключевыми стихами",
- leftLabel:"Книга", rightLabel:"Ключевой стих",
- pairs:[
-  {left:"Аввакум",right:"«Праведный верою жив будет» (2:4)"},
-  {left:"Михей",right:"«Действовать справедливо, любить милосердие…» (6:8)"},
-  {left:"Софония",right:"«День Господень близок» (1:14)"},
-  {left:"Екклесиаст",right:"«Бойся Бога и заповеди Его соблюдай» (12:13)"},
-  {left:"Плач Иеремии",right:"«Велика Твоя верность» (3:22–23)"}
- ],
+{type:"match",book:"Сопоставление",category:"Сопоставление",books:["Аввакум","Михей","Софония","Екклесиаст","Плач Иеремии"],
+ q:"Сопоставьте книги с их ключевыми стихами",leftLabel:"Книга", rightLabel:"Ключевой стих",
+ pairs:[{left:"Аввакум",right:"«Праведный верою жив будет» (2:4)"},{left:"Михей",right:"«Действовать справедливо, любить милосердие…» (6:8)"},{left:"Софония",right:"«День Господень близок» (1:14)"},{left:"Екклесиаст",right:"«Бойся Бога и заповеди Его соблюдай» (12:13)"},{left:"Плач Иеремии",right:"«Велика Твоя верность» (3:22–23)"}],
  why:"Ключевые стихи каждой книги прямо названы на слайдах."}
 ];
 
 QUESTIONS.push(...MATCH_QUESTIONS);
 
 const BOOKS = ["Бытие","Исход","Левит","Числа","Второзаконие","Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","1 Паралипоменон","2 Паралипоменон","Ездра","Неемия","Есфирь","Иов","Псалтирь","Притчи","Екклесиаст","Песнь песней","Исаия","Иеремия","Плач Иеремии","Иезекииль","Даниил","Осия","Иоиль","Амос","Авдий","Иона","Михей","Наум","Аввакум","Софония","Аггей","Захария","Малахия"];
+
+/* ============ КАТЕГОРИИ КНИГ ============ */
+const CATEGORIES = {
+  "Пятикнижие": ["Бытие","Исход","Левит","Числа","Второзаконие"],
+  "Исторические": ["Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","1 Паралипоменон","2 Паралипоменон","Ездра","Неемия","Есфирь"],
+  "Поэтические": ["Иов","Псалтирь","Притчи","Екклесиаст","Песнь песней"],
+  "Большие пророки": ["Исаия","Иеремия","Плач Иеремии","Иезекииль","Даниил"],
+  "Малые пророки": ["Осия","Иоиль","Амос","Авдий","Иона","Михей","Наум","Аввакум","Софония","Аггей","Захария","Малахия"]
+};
 
 const $ = id => document.getElementById(id);
 const LETTERS = ["А","Б","В","Г"];
@@ -495,11 +435,8 @@ const LETTERS = ["А","Б","В","Г"];
 const STORAGE_KEY = "bibleQuizProgress_v3";
 let progress = loadProgress();
 function loadProgress(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return defaultProgress();
-    return Object.assign(defaultProgress(), JSON.parse(raw));
-  }catch(e){ return defaultProgress(); }
+  try{ const raw = localStorage.getItem(STORAGE_KEY); if(!raw) return defaultProgress(); return Object.assign(defaultProgress(), JSON.parse(raw)); }
+  catch(e){ return defaultProgress(); }
 }
 function defaultProgress(){ return { totalAnswered:0, totalCorrect:0, byBook:{}, byCategory:{}, rounds:[], streak:0, bestStreak:0 }; }
 function saveProgress(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){} }
@@ -523,8 +460,45 @@ function recordRound(data){
 /* ============ UI INIT ============ */
 $("booklist").innerHTML = BOOKS.map(b=>`<div class="book"><span>${b}</span><span class="bar" data-book="${b}"></span></div>`).join("");
 
-/* ============ МУЛЬТИВЫБОР КНИГ (глобальный фильтр) ============ */
+/* ============ МУЛЬТИВЫБОР + КАТЕГОРИИ ============ */
 const selectedBooks = new Set();  // пусто = все книги
+
+function renderCategoryButtons(){
+  $("catButtons").innerHTML = Object.keys(CATEGORIES).map(cat => {
+    const n = CATEGORIES[cat].length;
+    return `<button type="button" class="cat-btn" data-cat="${cat}">${cat}<span class="cnt">${n}</span></button>`;
+  }).join("");
+  $("catButtons").querySelectorAll(".cat-btn").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const cat = btn.dataset.cat;
+      const books = CATEGORIES[cat];
+      const allSelected = books.every(b=>selectedBooks.has(b));
+      if(allSelected){
+        books.forEach(b=>selectedBooks.delete(b));
+        $("bookFilter").querySelectorAll(".book-chip").forEach(el=>{
+          if(books.includes(el.dataset.book)) el.classList.remove("selected");
+        });
+      } else {
+        books.forEach(b=>selectedBooks.add(b));
+        $("bookFilter").querySelectorAll(".book-chip").forEach(el=>{
+          if(books.includes(el.dataset.book)) el.classList.add("selected");
+        });
+      }
+      onBookSelectionChange();
+    });
+  });
+}
+
+function updateCategoryButtonsState(){
+  $("catButtons").querySelectorAll(".cat-btn").forEach(btn=>{
+    const cat = btn.dataset.cat;
+    const books = CATEGORIES[cat];
+    const selCount = books.filter(b=>selectedBooks.has(b)).length;
+    btn.classList.remove("selected","partial");
+    if(selCount === books.length) btn.classList.add("selected");
+    else if(selCount > 0) btn.classList.add("partial");
+  });
+}
 
 function renderBookFilter(){
   $("bookFilter").innerHTML = BOOKS.map(b=>`<button type="button" class="book-chip" data-book="${b}">${b}</button>`).join("");
@@ -539,7 +513,7 @@ function renderBookFilter(){
   });
   onBookSelectionChange();
 }
-renderBookFilter();
+
 $("selectAllBooks").addEventListener("click", ()=>{
   BOOKS.forEach(b=>selectedBooks.add(b));
   $("bookFilter").querySelectorAll(".book-chip").forEach(el=>el.classList.add("selected"));
@@ -554,15 +528,14 @@ $("clearBooks").addEventListener("click", ()=>{
 function onBookSelectionChange(){
   const n = selectedBooks.size;
   $("selectedCount").textContent = n === 0 ? "выбрано: 0 (все книги)" : (n === BOOKS.length ? `выбрано: все ${n}` : `выбрано: ${n} из ${BOOKS.length}`);
-  // обновляем счётчик доступных вопросов с учётом выбранных книг
+  updateCategoryButtonsState();
   const available = filterByBooks(QUESTIONS);
   $("totalLabel").textContent = `Доступно вопросов: ${available.length}${n>0 ? " (по выбранным книгам)" : " (все книги)"}`;
 }
 
-/* ============ ФИЛЬТРАЦИЯ ПО КНИГАМ ============ */
+/* ============ ФИЛЬТРАЦИЯ ============ */
 function bookMatches(q, selectedSet){
-  if(selectedSet.size === 0) return true; // пусто = все книги
-  // для match-вопросов — тег books
+  if(selectedSet.size === 0) return true;
   if(q.type === "match"){
     if(!q.books) return false;
     return q.books.some(b => selectedSet.has(b));
@@ -617,6 +590,10 @@ function renderProgressPanel(){
     else el.textContent = "";
   });
 }
+
+/* ============ ИНИЦИАЛИЗАЦИЯ UI ============ */
+renderCategoryButtons();
+renderBookFilter();
 renderProgressPanel();
 
 /* ============ ИГРА ============ */
@@ -630,24 +607,17 @@ function start(){
   let pool = [...QUESTIONS];
   const mode = $("mode").value;
   roundMode = $("mode").selectedOptions[0].textContent;
-
-  // 1. Фильтр по выбранным книгам (работает ВСЕГДА, если что-то выбрано)
   pool = filterByBooks(pool);
-
-  // 2. Фильтр по режиму
   if(mode==="match") pool = pool.filter(q => q.type === "match");
   if(mode==="author") pool = pool.filter(q=> q.type !== "match" && (q.category==="Автор"||q.category==="История"));
   if(mode==="goal") pool = pool.filter(q=> q.type !== "match" && q.category==="Цель");
   if(mode==="theme") pool = pool.filter(q=> q.type !== "match" && (q.category==="Тема"||q.category==="Ключевой стих"));
   if(mode==="structure") pool = pool.filter(q=> q.type !== "match" && (q.category==="Структура"||q.category==="Жанр"));
   if(mode==="hard") pool = pool.filter(q => q.why && q.why.length > 60);
-
-  // 3. Перемешивание и обрезка
   if(mode==="mixed") pool = shuffle(pool).slice(0,20);
   if($("order").value==="random") pool = shuffle(pool);
   const count = $("count").value;
   if(mode!=="mixed" && count!=="all") pool = pool.slice(0, Number(count));
-
   if(!pool.length){
     const msg = selectedBooks.size > 0
       ? "Для выбранных книг и режима нет вопросов. Попробуй расширить выбор книг или сменить режим."
@@ -655,7 +625,6 @@ function start(){
     alert(msg);
     return;
   }
-
   round = pool; index = 0; correct = 0; mistakes = []; matchState = null;
   $("intro").classList.add("hidden"); $("result").classList.add("hidden"); $("game").classList.remove("hidden");
   render();
@@ -687,51 +656,29 @@ function render(){
   }
 }
 
-/* ============ СОПОСТАВЛЕНИЕ ============ */
 function renderMatch(q){
   const rightOrder = shuffle(q.pairs.map((_,i)=>i));
-  matchState = {
-    pairs: q.pairs, rightOrder,
-    matchedLeft: new Set(), matchedRight: new Set(),
-    selectedLeft: null, correctCount: 0
-  };
-  const leftHTML = q.pairs.map((p,i)=>
-    `<button type="button" class="match-item" data-side="left" data-idx="${i}">${p.left}</button>`
-  ).join("");
-  const rightHTML = rightOrder.map(i=>
-    `<button type="button" class="match-item" data-side="right" data-idx="${i}">${q.pairs[i].right}</button>`
-  ).join("");
+  matchState = { pairs: q.pairs, rightOrder, matchedLeft: new Set(), matchedRight: new Set(), selectedLeft: null, correctCount: 0 };
+  const leftHTML = q.pairs.map((p,i)=>`<button type="button" class="match-item" data-side="left" data-idx="${i}">${p.left}</button>`).join("");
+  const rightHTML = rightOrder.map(i=>`<button type="button" class="match-item" data-side="right" data-idx="${i}">${q.pairs[i].right}</button>`).join("");
   $("answers").innerHTML = `
     <div class="match-wrap">
       <div class="match-selection-bar" id="matchSelBar"></div>
       <div class="match-columns">
-        <div class="match-col">
-          <div class="match-col-header">${q.leftLabel || "Столбец A"}</div>
-          ${leftHTML}
-        </div>
-        <div class="match-col">
-          <div class="match-col-header">${q.rightLabel || "Столбец B"}</div>
-          ${rightHTML}
-        </div>
+        <div class="match-col"><div class="match-col-header">${q.leftLabel || "Столбец A"}</div>${leftHTML}</div>
+        <div class="match-col"><div class="match-col-header">${q.rightLabel || "Столбец B"}</div>${rightHTML}</div>
       </div>
       <div class="match-progress"><div class="match-progress-fill" id="matchFill" style="width:0%"></div></div>
       <div class="match-status" id="matchStatus">Совпадений: 0 из ${q.pairs.length}</div>
       <div class="match-hint">${IS_MOBILE() ? 'Выбери элемент в верхнем списке, затем пару в нижнем ↓' : 'Кликни по элементу слева, затем по соответствующему справа'}</div>
-    </div>
-  `;
+    </div>`;
   $("answers").querySelectorAll(".match-item").forEach(el=>el.addEventListener("click", onMatchClick));
 }
 
 function updateSelectionBanner(text){
-  const bar = $("matchSelBar");
-  if(!bar) return;
-  if(text){
-    bar.classList.add("active");
-    bar.innerHTML = `Выбрано: <strong>${text}</strong><span style="color:var(--muted);font-weight:normal">↓ теперь выберите пару ниже</span>`;
-  } else {
-    bar.classList.remove("active");
-    bar.innerHTML = "";
-  }
+  const bar = $("matchSelBar"); if(!bar) return;
+  if(text){ bar.classList.add("active"); bar.innerHTML = `Выбрано: <strong>${text}</strong><span style="color:var(--muted);font-weight:normal">↓ теперь выберите пару ниже</span>`; }
+  else { bar.classList.remove("active"); bar.innerHTML = ""; }
 }
 
 function onMatchClick(e){
@@ -740,7 +687,6 @@ function onMatchClick(e){
   if(el.classList.contains("matched")) return;
   const side = el.dataset.side;
   const idx = Number(el.dataset.idx);
-
   if(side === "left"){
     $("answers").querySelectorAll('.match-item[data-side="left"].selected').forEach(x=>x.classList.remove("selected"));
     el.classList.add("selected");
@@ -748,13 +694,10 @@ function onMatchClick(e){
     updateSelectionBanner(matchState.pairs[idx].left);
     return;
   }
-
   if(matchState.selectedLeft === null) return;
   const leftIdx = matchState.selectedLeft;
   if(leftIdx === idx){
-    matchState.matchedLeft.add(leftIdx);
-    matchState.matchedRight.add(idx);
-    matchState.correctCount++;
+    matchState.matchedLeft.add(leftIdx); matchState.matchedRight.add(idx); matchState.correctCount++;
     const leftEl = $("answers").querySelector(`.match-item[data-side="left"][data-idx="${leftIdx}"]`);
     if(leftEl){ leftEl.classList.remove("selected"); leftEl.classList.add("matched"); }
     el.classList.add("matched");
@@ -764,20 +707,14 @@ function onMatchClick(e){
     const fill = $("matchFill"); if(fill) fill.style.width = pct+"%";
     const st = $("matchStatus"); if(st) st.textContent = `Совпадений: ${matchState.correctCount} из ${matchState.pairs.length}`;
     if(IS_MOBILE() && matchState.correctCount < matchState.pairs.length){
-      setTimeout(()=>{
-        const wrap = document.querySelector('.match-wrap');
-        if(wrap) wrap.scrollIntoView({behavior: 'smooth', block: 'start'});
-      }, 250);
+      setTimeout(()=>{ const wrap = document.querySelector('.match-wrap'); if(wrap) wrap.scrollIntoView({behavior: 'smooth', block: 'start'}); }, 250);
     }
     if(matchState.correctCount === matchState.pairs.length) finishMatch();
   } else {
     el.classList.add("wrong-flash");
     const leftEl = $("answers").querySelector(`.match-item[data-side="left"][data-idx="${leftIdx}"]`);
     if(leftEl) leftEl.classList.add("wrong-flash");
-    setTimeout(()=>{
-      el.classList.remove("wrong-flash");
-      if(leftEl) leftEl.classList.remove("wrong-flash");
-    }, 500);
+    setTimeout(()=>{ el.classList.remove("wrong-flash"); if(leftEl) leftEl.classList.remove("wrong-flash"); }, 500);
     if(navigator.vibrate) navigator.vibrate(60);
   }
 }
@@ -795,7 +732,6 @@ function finishMatch(){
   if(navigator.vibrate) navigator.vibrate([40, 40, 40]);
 }
 
-/* ============ SINGLE-ANSWER ============ */
 function choose(n){
   if(answered) return;
   answered = true;
@@ -814,9 +750,7 @@ function choose(n){
   $("scoreText").textContent = `Верно: ${correct}`;
   $("next").disabled = false;
   if(navigator.vibrate) navigator.vibrate(good ? 30 : [40, 40]);
-  if(IS_MOBILE()){
-    setTimeout(()=>{ fb.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }, 100);
-  }
+  if(IS_MOBILE()){ setTimeout(()=>{ fb.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }, 100); }
 }
 
 function finish(){
@@ -826,9 +760,7 @@ function finish(){
   $("resultText").textContent = `Правильных ответов: ${correct} из ${round.length}. ${pct>=90?"Отличное знание материала!":pct>=70?"Хороший результат. Повтори вопросы с ошибками.":pct>=50?"Есть основа — закрепи слабые места и сыграй ещё раз.":"Стоит повторить презентацию и пройти раунд снова."}`;
   $("missed").innerHTML = mistakes.length
     ? `<h3>Что стоит повторить</h3>` + mistakes.map(m=>{
-        if(m.q.type === "match"){
-          return `<div class="feedback bad"><strong>${m.q.q}</strong><div class="small">${m.q.why || ""}</div></div>`;
-        }
+        if(m.q.type === "match"){ return `<div class="feedback bad"><strong>${m.q.q}</strong><div class="small">${m.q.why || ""}</div></div>`; }
         return `<div class="feedback bad"><strong>${m.q.book}: ${m.q.q}</strong><div>Правильный ответ: ${m.q.a[m.q.correct]}</div><div class="small">${m.q.why}</div></div>`;
       }).join("")
     : "<h3>Без ошибок — так держать!</h3>";
