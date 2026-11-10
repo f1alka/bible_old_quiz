@@ -16,10 +16,8 @@ label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
 select{width:100%;background:#0d1828;color:var(--text);border:1px solid var(--line);padding:12px;border-radius:12px;font-size:16px;min-height:48px}
 button{font:inherit;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
 .primary,.secondary{border:0;border-radius:13px;padding:13px 18px;font-weight:750;min-height:48px}
-.primary{background:var(--gold);color:#172033}.primary:hover{filter:brightness(1.07)}
-.primary:active{transform:scale(.98)}
-.secondary{background:#243750;color:var(--text);border:1px solid #40536c}
-.secondary:active{transform:scale(.98)}
+.primary{background:var(--gold);color:#172033}.primary:hover{filter:brightness(1.07)}.primary:active{transform:scale(.98)}
+.secondary{background:#243750;color:var(--text);border:1px solid #40536c}.secondary:active{transform:scale(.98)}
 .startrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
 .small{font-size:13px;color:var(--muted)}
 .stats{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px;margin-bottom:10px}
@@ -63,6 +61,8 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
 .book-chip.selected{background:var(--gold);color:#172033;border-color:var(--gold);font-weight:800}
 .mini-btn{background:#243750;color:var(--text);border:1px solid #40536c;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;margin-right:6px;margin-top:6px;min-height:38px}
 .mini-btn:hover{border-color:var(--gold)}
+.filter-hint{font-size:12px;color:var(--muted);margin-top:6px}
+.filter-hint strong{color:var(--gold)}
 /* Matching */
 .match-wrap{margin-top:8px}
 .match-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
@@ -82,9 +82,8 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
 .match-selection-bar.active{display:block}
 .match-selection-bar strong{color:var(--text);display:block;margin-top:2px}
 
-/* ============ МОБИЛЬНАЯ АДАПТАЦИЯ ============ */
 @media (max-width:640px){
-  body{padding-bottom:120px} /* место под фикс. панель управления */
+  body{padding-bottom:120px}
   .wrap{padding:14px 12px 30px}
   header{margin-bottom:14px;gap:8px}
   header .pill{font-size:10px;padding:5px 9px}
@@ -104,24 +103,8 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
   .stat-box .lbl{font-size:10px}
   .chart{height:70px}
   .history-item{padding:9px 10px;font-size:12px}
-
-  /* ИГРА — фиксированная панель управления */
-  .controls{
-    position:fixed;bottom:0;left:0;right:0;
-    background:#121e30;
-    border-top:1px solid var(--line);
-    padding:10px 12px;
-    padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));
-    z-index:100;
-    margin:0;gap:8px;
-    box-shadow:0 -8px 24px #000a;
-  }
-  .controls .primary,.controls .secondary{
-    flex:1;min-height:52px;font-size:15px;padding:12px 8px;
-  }
-  /* Скрываем панель, когда игра не активна (она внутри #game.hidden) — уже работает автоматически */
-
-  /* Карточка игры — компактнее */
+  .controls{position:fixed;bottom:0;left:0;right:0;background:#121e30;border-top:1px solid var(--line);padding:10px 12px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:100;margin:0;gap:8px;box-shadow:0 -8px 24px #000a}
+  .controls .primary,.controls .secondary{flex:1;min-height:52px;font-size:15px;padding:12px 8px}
   #game.card{padding:14px 12px 20px}
   .stats{font-size:12px;margin-bottom:8px}
   .track{margin-bottom:16px;height:6px}
@@ -134,37 +117,23 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
   .letter{flex:0 0 26px;height:26px;font-size:14px}
   .feedback{padding:12px;font-size:14px;margin-top:12px}
   .controls{margin-top:0}
-
-  /* Сопоставление — вертикальная раскладка */
   .match-columns{grid-template-columns:1fr;gap:14px}
   .match-col{gap:8px}
   .match-col-header{font-size:10px;margin-top:4px}
   .match-item{padding:12px 14px;font-size:14px;min-height:52px;line-height:1.4}
-  .match-selection-bar{
-    position:sticky;top:0;z-index:10;
-    background:#2a3a51;padding:10px 12px;
-    margin:-4px 0 10px 0;
-    box-shadow:0 4px 14px #0008;
-    border-radius:10px;
-  }
+  .match-selection-bar{position:sticky;top:0;z-index:10;background:#2a3a51;padding:10px 12px;margin:-4px 0 10px 0;box-shadow:0 4px 14px #0008;border-radius:10px}
   .match-hint{font-size:11.5px;margin-top:12px}
-
-  /* Результат */
   .result .score{font-size:44px;margin:10px}
   .result .startrow{flex-direction:column;gap:8px}
   .result .startrow .primary,.result .startrow .secondary{width:100%}
-
-  /* Прогресс-панель и кнопка сброса */
   #resetProgress{width:100%}
-
-  /* Скрываем длинное описание вверху на очень маленьких экранах? Нет — пусть будет */
+  .book-filter{max-height:150px}
+  .book-chip{font-size:12px;padding:7px 11px}
 }
-
 @media (max-width:360px){
   .question{font-size:17.5px}
   .answer{font-size:14px;padding:12px 10px}
   .match-item{font-size:13px;padding:11px 12px}
-  .book-chip{font-size:12px;padding:7px 11px}
 }
 </style></head><body><div class="wrap">
 
@@ -174,7 +143,7 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
   <div class="brand">Запоминай через повторение</div>
   <h1>Обзор Ветхого Завета</h1>
   <p class="sub">Проверь, насколько хорошо ты запомнил авторов, цели, главные темы, структуры и особенности книг. Неверные ответы подобраны максимально близко к правде — чтобы приходилось действительно думать.</p>
-  <div class="notice">Источник — презентация «Обзор Ветхого Завета» и «Тестики на пятёрочку».</div>
+  <div class="notice">Источник — презентация «Обзор Ветхого Завета» и «Тестики на пятёрочку». Фильтр книг работает во всех режимах: выбери книги в блоке ниже — и вопросы будут браться только из них.</div>
 
   <h3 style="margin:6px 0 4px">📊 Твой прогресс</h3>
   <div class="progress-panel">
@@ -187,10 +156,20 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
   <div id="historyList"></div>
   <div class="startrow" style="margin-top:14px"><button class="secondary" id="resetProgress">Сбросить прогресс</button></div>
 
-  <div class="setup-grid">
+  <!-- ФИЛЬТР КНИГ — всегда видим -->
+  <div style="margin-top:26px">
+    <label style="font-size:15px;color:var(--text);font-weight:700">📚 Выбрать книги (работает во всех режимах)</label>
+    <p class="filter-hint">Если книги не выбраны — вопросы берутся из всех книг. Если выбраны — только из них. <strong id="selectedCount">выбрано: 0 (все книги)</strong></p>
+    <div class="book-filter" id="bookFilter"></div>
+    <div>
+      <button type="button" class="mini-btn" id="selectAllBooks">Выбрать все</button>
+      <button type="button" class="mini-btn" id="clearBooks">Сбросить (все книги)</button>
+    </div>
+  </div>
+
+  <div class="setup-grid" style="margin-top:22px">
     <div><label for="mode">Режим</label><select id="mode">
       <option value="all">Все темы вперемешку</option>
-      <option value="book">Выбрать книги (можно несколько)</option>
       <option value="match">🔗 Сопоставление (только этот тип)</option>
       <option value="author">Автор и дата</option>
       <option value="goal">Цели книг</option>
@@ -199,26 +178,20 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
       <option value="hard">🔥 Сложные (только дистракторы)</option>
       <option value="mixed">Экзамен — 20 вопросов</option>
     </select></div>
-    <div id="bookWrap" class="hidden">
-      <label>Книги (кликни, чтобы выбрать / отменить)</label>
-      <div class="book-filter" id="bookFilter"></div>
-      <div>
-        <button type="button" class="mini-btn" id="selectAllBooks">Выбрать все</button>
-        <button type="button" class="mini-btn" id="clearBooks">Сбросить</button>
-        <span class="small" id="selectedCount" style="margin-left:6px">выбрано: 0</span>
-      </div>
-    </div>
     <div><label for="count">Количество вопросов</label><select id="count">
       <option value="10">10 вопросов</option>
       <option value="20" selected>20 вопросов</option>
-      <option value="all">Все доступные вопросы</option>
+      <option value="all">Все доступные</option>
     </select></div>
     <div><label for="order">Порядок</label><select id="order">
       <option value="random">Случайный</option>
       <option value="sequence">По порядку презентации</option>
     </select></div>
+    <div style="display:flex;align-items:flex-end">
+      <button class="primary" id="start" style="width:100%">Начать игру →</button>
+    </div>
   </div>
-  <div class="startrow"><button class="primary" id="start">Начать игру →</button><span class="small" id="totalLabel"></span></div>
+  <div class="startrow" style="margin-top:8px"><span class="small" id="totalLabel"></span></div>
 
   <h3 style="margin:28px 0 4px">Все 39 книг Ветхого Завета</h3>
   <p class="small">Список охватывает протестантский канон. Прогресс по книге показан справа.</p>
@@ -250,7 +223,7 @@ footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
 <script>
 "use strict";
 
-/* ============ БАЗА ВОПРОСОВ ============ */
+/* ============ БАЗА ВОПРОСОВ (single-answer) ============ */
 const QUESTIONS = [
 {book:"Введение",category:"Введение",q:"Какие две основные причины пренебрежения Ветхим Заветом названы в курсе?",a:["Исторические причины и сложность Ветхого Завета","Отсутствие переводов и гонения на церковь","Влияние языческих культур и политические запреты","Недостаток рукописей и отсутствие пророков"],correct:0,why:"Слайд прямо называет две причины: исторические причины пренебрежения и сложность Ветхого Завета."},
 {book:"Введение",category:"Введение",q:"Какой процент всей Библии составляет Ветхий Завет?",a:["Около 74% (¾ всей Библии)","Около 50%","Около 25%","Около 90%"],correct:0,why:"В презентации указано: Ветхий Завет составляет ¾ всей Библии, это около 74%."},
@@ -280,6 +253,7 @@ const QUESTIONS = [
 {book:"Второзаконие",category:"Цель",q:"Какова одна из основных целей Второзакония?",a:["Актуализировать закон и завет для нового поколения перед входом в землю","Описать сотворение мира","Рассказать о строительстве второго храма","Объяснить служение пророка Ионы"],correct:0,why:"На слайде цели: актуализация закона и призыв верно следовать завету."},
 {book:"Второзаконие",category:"Жанр",q:"В каком виде представлена книга Второзаконие согласно презентации?",a:["Как основные обращения Моисея к Израилю — прощальная речь","Как собрание царских псалмов","Как биография пророка в изгнании","Как хроника строительства стен"],correct:0,why:"Презентация описывает книгу как проповедь/прощальные обращения Моисея."},
 {book:"Второзаконие",category:"Структура",q:"Какова структура Второзакония (по Прокопенко)?",a:["1-я проповедь (прошлое, 1–4); 2-я проповедь (настоящее, 5–26); 3-я проповедь (будущее, 27–30); историческое дополнение (31–34)","Избавление (1–18); завет (19–24); скиния (25–40)","Первобытная история (1–11); патриархи (12–50)","Первое поколение (1–25); второе поколение (26–36)"],correct:0,why:"Прокопенко: 1) Первая проповедь (1–4); 2) Вторая проповедь (5–26); 3) Третья проповедь (27–30); 4) Историческое дополнение (31–34)."},
+
 {book:"Иисус Навин",category:"Автор",q:"Кому традиция, приведённая в презентации, приписывает книгу Иисуса Навина?",a:["Иисусу Навину","Моисею","Самуилу","Ездре"],correct:0,why:"На слайде об авторстве указано: автор — Иисус Навин; приведена иудейская традиция."},
 {book:"Иисус Навин",category:"Тема",q:"Какой основной этап истории Израиля описывает книга Иисуса Навина?",a:["Вхождение в землю и её завоевание/разделение","Исход из Египта","Строительство второго храма","Возвращение из вавилонского плена"],correct:0,why:"Разделы книги посвящены завоеванию земли и её распределению."},
 {book:"Иисус Навин",category:"Структура",q:"Какова структура книги Иисуса Навина?",a:["Вхождение в землю (1–5); завоевание (6–12); распределение (13–22); сохранение (23–24)","Избавление (1–18); завет (19–24); скиния (25–40)","Первое поколение (1–25); второе поколение (26–36)","Судьи (1–16); приложения (17–21)"],correct:0,why:"Иисус Навин: 1) Вхождение (1–5); 2) Завоевание (6–12); 3) Распределение (13–22); 4) Сохранение (23–24)."},
@@ -397,6 +371,7 @@ const QUESTIONS = [
 /* ============ ВОПРОСЫ НА СОПОСТАВЛЕНИЕ ============ */
 const MATCH_QUESTIONS = [
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["Бытие","Исход","Левит","Числа","Второзаконие"],
  q:"Сопоставьте книги Пятикнижия с их главными идеями",
  leftLabel:"Книга", rightLabel:"Главная идея",
  pairs:[
@@ -407,7 +382,9 @@ const MATCH_QUESTIONS = [
   {left:"Второзаконие",right:"Обновление завета перед входом в землю"}
  ],
  why:"Бытие — происхождение; Исход — спасение и завет; Левит — святость; Числа — странствие; Второзаконие — обновление завета."},
+
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","Ездра","Неемия"],
  q:"Сопоставьте исторические книги с их ключевыми персонажами",
  leftLabel:"Книга", rightLabel:"Ключевые лица",
  pairs:[
@@ -419,7 +396,9 @@ const MATCH_QUESTIONS = [
   {left:"Ездра–Неемия",right:"Зоровавель, Ездра, Неемия"}
  ],
  why:"Завоевание — Иисус Навин; судьи — харизматические лидеры; Руфь — моавитянка и Вооз; ранняя монархия — Саул и Давид; поздняя — Соломон и пророки; восстановление — Зоровавель, Ездра, Неемия."},
+
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["Осия","Иоиль","Амос","Авдий","Иона","Михей"],
  q:"Сопоставьте малых пророков с их главными темами",
  leftLabel:"Пророк", rightLabel:"Главная тема",
  pairs:[
@@ -431,7 +410,9 @@ const MATCH_QUESTIONS = [
   {left:"Михей",right:"Справедливость, милосердие и смиренномудрие"}
  ],
  why:"Осия — брак как завет; Иоиль — День Господень; Амос — социальная несправедливость; Авдий — суд над Едомом; Иона — милость к язычникам; Михей — Мих. 6:8."},
+
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["Авдий","Иона","Михей","Софония","Аггей","Захария","Малахия"],
  q:"Сопоставьте имена пророков с их значениями",
  leftLabel:"Имя пророка", rightLabel:"Значение имени",
  pairs:[
@@ -444,7 +425,9 @@ const MATCH_QUESTIONS = [
   {left:"Малахия",right:"«Мой вестник»"}
  ],
  why:"Значения имён прямо указаны на слайдах о каждом пророке."},
+
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["Наум","Аввакум","Софония","Аггей","Захария","Малахия"],
  q:"Сопоставьте пророков с их ключевыми концепциями",
  leftLabel:"Пророк", rightLabel:"Ключевая концепция",
  pairs:[
@@ -456,7 +439,9 @@ const MATCH_QUESTIONS = [
   {left:"Малахия",right:"Пришествие вестника и День Господень"}
  ],
  why:"Наум — суд над Ниневией; Аввакум — вера; Софония — всемирный суд; Аггей — храм; Захария — видения; Малахия — вестник."},
+
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["4 Царств","Иеремия","Ездра","Неемия","Аггей","Наум","Софония"],
  q:"Сопоставьте события с их датами",
  leftLabel:"Событие", rightLabel:"Дата",
  pairs:[
@@ -469,7 +454,9 @@ const MATCH_QUESTIONS = [
   {left:"Падение Ниневии",right:"612 г. до н.э."}
  ],
  why:"722 — Самария; 586 — Иерусалим; 538 — указ Кира; 516 — храм; 458 — Ездра; 445 — Неемия; 612 — Ниневия."},
+
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["Псалтирь","Притчи","Иов","Песнь песней","Екклесиаст","Плач Иеремии","Даниил"],
  q:"Сопоставьте книги с их жанрами",
  leftLabel:"Книга", rightLabel:"Жанр",
  pairs:[
@@ -482,7 +469,9 @@ const MATCH_QUESTIONS = [
   {left:"Даниил",right:"Апокалиптическая литература"}
  ],
  why:"Каждая книга имеет свой жанр, подробно разобранный на слайдах."},
+
 {type:"match",book:"Сопоставление",category:"Сопоставление",
+ books:["Аввакум","Михей","Софония","Екклесиаст","Плач Иеремии"],
  q:"Сопоставьте книги с их ключевыми стихами",
  leftLabel:"Книга", rightLabel:"Ключевой стих",
  pairs:[
@@ -533,9 +522,10 @@ function recordRound(data){
 
 /* ============ UI INIT ============ */
 $("booklist").innerHTML = BOOKS.map(b=>`<div class="book"><span>${b}</span><span class="bar" data-book="${b}"></span></div>`).join("");
-$("totalLabel").textContent = `Вопросов в базе: ${QUESTIONS.length} (включая ${MATCH_QUESTIONS.length} на сопоставление)`;
 
-const selectedBooks = new Set();
+/* ============ МУЛЬТИВЫБОР КНИГ (глобальный фильтр) ============ */
+const selectedBooks = new Set();  // пусто = все книги
+
 function renderBookFilter(){
   $("bookFilter").innerHTML = BOOKS.map(b=>`<button type="button" class="book-chip" data-book="${b}">${b}</button>`).join("");
   $("bookFilter").querySelectorAll(".book-chip").forEach(el=>{
@@ -544,26 +534,55 @@ function renderBookFilter(){
       if(selectedBooks.has(b)) selectedBooks.delete(b);
       else selectedBooks.add(b);
       el.classList.toggle("selected");
-      $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
+      onBookSelectionChange();
     });
   });
-  $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
+  onBookSelectionChange();
 }
 renderBookFilter();
 $("selectAllBooks").addEventListener("click", ()=>{
   BOOKS.forEach(b=>selectedBooks.add(b));
   $("bookFilter").querySelectorAll(".book-chip").forEach(el=>el.classList.add("selected"));
-  $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
+  onBookSelectionChange();
 });
 $("clearBooks").addEventListener("click", ()=>{
   selectedBooks.clear();
   $("bookFilter").querySelectorAll(".book-chip").forEach(el=>el.classList.remove("selected"));
-  $("selectedCount").textContent = `выбрано: ${selectedBooks.size}`;
-});
-$("mode").addEventListener("change", ()=>{
-  $("bookWrap").classList.toggle("hidden", $("mode").value !== "book");
+  onBookSelectionChange();
 });
 
+function onBookSelectionChange(){
+  const n = selectedBooks.size;
+  $("selectedCount").textContent = n === 0 ? "выбрано: 0 (все книги)" : (n === BOOKS.length ? `выбрано: все ${n}` : `выбрано: ${n} из ${BOOKS.length}`);
+  // обновляем счётчик доступных вопросов с учётом выбранных книг
+  const available = filterByBooks(QUESTIONS);
+  $("totalLabel").textContent = `Доступно вопросов: ${available.length}${n>0 ? " (по выбранным книгам)" : " (все книги)"}`;
+}
+
+/* ============ ФИЛЬТРАЦИЯ ПО КНИГАМ ============ */
+function bookMatches(q, selectedSet){
+  if(selectedSet.size === 0) return true; // пусто = все книги
+  // для match-вопросов — тег books
+  if(q.type === "match"){
+    if(!q.books) return false;
+    return q.books.some(b => selectedSet.has(b));
+  }
+  const qbook = q.book;
+  for(const b of selectedSet){
+    if(qbook === b) return true;
+    if((b==="1 Царств"||b==="2 Царств") && qbook==="1–2 Царств") return true;
+    if((b==="3 Царств"||b==="4 Царств") && qbook==="3–4 Царств") return true;
+    if((b==="1 Паралипоменон"||b==="2 Паралипоменон") && qbook==="1–2 Паралипоменон") return true;
+    if((b==="Ездра"||b==="Неемия") && qbook==="Ездра–Неемия") return true;
+  }
+  return false;
+}
+function filterByBooks(pool){
+  if(selectedBooks.size === 0) return pool;
+  return pool.filter(q => bookMatches(q, selectedBooks));
+}
+
+/* ============ ПРОГРЕСС-ПАНЕЛЬ ============ */
 function renderProgressPanel(){
   $("pTotalAns").textContent = progress.totalAnswered;
   $("pTotalCor").textContent = progress.totalCorrect;
@@ -607,37 +626,36 @@ const IS_MOBILE = () => window.innerWidth <= 640;
 
 function shuffle(a){ const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
 
-function bookMatches(qbook, selectedSet){
-  if(qbook === "Сопоставление") return false;
-  for(const b of selectedSet){
-    if(qbook === b) return true;
-    if((b==="1 Царств"||b==="2 Царств") && qbook==="1–2 Царств") return true;
-    if((b==="3 Царств"||b==="4 Царств") && qbook==="3–4 Царств") return true;
-    if((b==="1 Паралипоменон"||b==="2 Паралипоменон") && qbook==="1–2 Паралипоменон") return true;
-    if((b==="Ездра"||b==="Неемия") && qbook==="Ездра–Неемия") return true;
-  }
-  return false;
-}
-
 function start(){
   let pool = [...QUESTIONS];
   const mode = $("mode").value;
   roundMode = $("mode").selectedOptions[0].textContent;
-  if(mode==="book"){
-    if(!selectedBooks.size){ alert("Выбери хотя бы одну книгу (или нажми «Выбрать все»)."); return; }
-    pool = pool.filter(q => bookMatches(q.book, selectedBooks));
-  }
+
+  // 1. Фильтр по выбранным книгам (работает ВСЕГДА, если что-то выбрано)
+  pool = filterByBooks(pool);
+
+  // 2. Фильтр по режиму
   if(mode==="match") pool = pool.filter(q => q.type === "match");
   if(mode==="author") pool = pool.filter(q=> q.type !== "match" && (q.category==="Автор"||q.category==="История"));
   if(mode==="goal") pool = pool.filter(q=> q.type !== "match" && q.category==="Цель");
   if(mode==="theme") pool = pool.filter(q=> q.type !== "match" && (q.category==="Тема"||q.category==="Ключевой стих"));
   if(mode==="structure") pool = pool.filter(q=> q.type !== "match" && (q.category==="Структура"||q.category==="Жанр"));
   if(mode==="hard") pool = pool.filter(q => q.why && q.why.length > 60);
+
+  // 3. Перемешивание и обрезка
   if(mode==="mixed") pool = shuffle(pool).slice(0,20);
   if($("order").value==="random") pool = shuffle(pool);
   const count = $("count").value;
   if(mode!=="mixed" && count!=="all") pool = pool.slice(0, Number(count));
-  if(!pool.length){ alert("Для выбранного режима нет вопросов. Измени фильтры."); return; }
+
+  if(!pool.length){
+    const msg = selectedBooks.size > 0
+      ? "Для выбранных книг и режима нет вопросов. Попробуй расширить выбор книг или сменить режим."
+      : "Для выбранного режима нет вопросов. Измени фильтры.";
+    alert(msg);
+    return;
+  }
+
   round = pool; index = 0; correct = 0; mistakes = []; matchState = null;
   $("intro").classList.add("hidden"); $("result").classList.add("hidden"); $("game").classList.remove("hidden");
   render();
@@ -656,7 +674,6 @@ function render(){
   $("feedback").className = "feedback hidden"; $("feedback").textContent = "";
   $("next").disabled = true;
   $("next").textContent = index===round.length-1 ? "Показать результат" : "Следующий вопрос →";
-  // прокрутка наверх при новом вопросе
   if(window.scrollY > 80) window.scrollTo({top: 0, behavior: 'smooth'});
   if(q.type === "match"){
     renderMatch(q);
@@ -746,7 +763,6 @@ function onMatchClick(e){
     const pct = Math.round(matchState.correctCount / matchState.pairs.length * 100);
     const fill = $("matchFill"); if(fill) fill.style.width = pct+"%";
     const st = $("matchStatus"); if(st) st.textContent = `Совпадений: ${matchState.correctCount} из ${matchState.pairs.length}`;
-    // на мобильном — прокрутить наверх, если остались пары
     if(IS_MOBILE() && matchState.correctCount < matchState.pairs.length){
       setTimeout(()=>{
         const wrap = document.querySelector('.match-wrap');
@@ -762,7 +778,6 @@ function onMatchClick(e){
       el.classList.remove("wrong-flash");
       if(leftEl) leftEl.classList.remove("wrong-flash");
     }, 500);
-    // вибрация на мобильном, если поддерживается
     if(navigator.vibrate) navigator.vibrate(60);
   }
 }
@@ -799,7 +814,6 @@ function choose(n){
   $("scoreText").textContent = `Верно: ${correct}`;
   $("next").disabled = false;
   if(navigator.vibrate) navigator.vibrate(good ? 30 : [40, 40]);
-  // на мобильном — прокрутить к фидбеку
   if(IS_MOBILE()){
     setTimeout(()=>{ fb.scrollIntoView({behavior: 'smooth', block: 'nearest'}); }, 100);
   }
