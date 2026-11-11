@@ -19,6 +19,7 @@
     <div class="brand" id="brandName">Тренажёр НББС</div>
     <div class="header-actions">
       <button id="themeToggle" class="pill pill-btn" title="Сменить тему" aria-label="Сменить тему">🌗</button>
+      <button id="settingsBtn" class="pill pill-btn" title="Настройки" aria-label="Настройки">⚙️</button>
       <div id="headerRight"></div>
     </div>
   </header>
@@ -60,7 +61,25 @@
     </div>
     <div id="progressDetail"></div>
     <div id="historyList"></div>
-    <div class="startrow" style="margin-top:14px"><button class="secondary" id="resetProgress">Сбросить прогресс</button></div>
+
+    <!-- БЛОК ГРАФИКОВ -->
+    <h3 style="margin:24px 0 4px">📈 Детальная статистика</h3>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h4>Активность (последние 20 недель)</h4>
+        <div id="heatmapContainer"></div>
+      </div>
+      <div class="stat-card">
+        <h4>Успеваемость по категориям</h4>
+        <div id="radarContainer"></div>
+      </div>
+      <div class="stat-card" style="grid-column: span 2;">
+        <h4>Динамика точности (последние 20 раундов)</h4>
+        <div id="lineChartContainer"></div>
+      </div>
+    </div>
+
+    <div class="startrow" style="margin-top:14px"><button class="secondary" id="resetProgress">Сбросить прогресс предмета</button></div>
 
     <div style="margin-top:26px">
       <label style="font-size:15px;color:var(--text);font-weight:700" id="filterLabel">📚 Выбрать разделы</label>
@@ -121,6 +140,54 @@
   </section>
 
   <footer>Работает офлайн · Прогресс хранится только на этом устройстве</footer>
+</div>
+
+<!-- МОДАЛКА НАСТРОЕК -->
+<div id="settingsModal" class="modal-backdrop hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Настройки</h2>
+      <button class="modal-close" id="closeSettings">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="settings-row">
+        <span>Тема оформления</span>
+        <select id="settingTheme">
+          <option value="auto">Авто</option>
+          <option value="light">Светлая</option>
+          <option value="dark">Тёмная</option>
+        </select>
+      </div>
+      <div class="settings-row">
+        <span>Звуки (верно/неверно)</span>
+        <label class="toggle">
+          <input type="checkbox" id="settingSound" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <span>Вибрация</span>
+        <label class="toggle">
+          <input type="checkbox" id="settingVibration" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="settings-row">
+        <span>Перемешивать ответы</span>
+        <label class="toggle">
+          <input type="checkbox" id="settingShuffle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <hr style="border-color: var(--line); margin: 16px 0;">
+      <div class="settings-row" style="flex-wrap:wrap;gap:8px">
+        <button class="secondary" id="exportProgress">Экспорт прогресса</button>
+        <button class="secondary" id="importProgressBtn">Импорт прогресса</button>
+        <input type="file" id="importProgressFile" accept=".json" class="hidden">
+        <button class="secondary" id="resetProgressModal" style="color:var(--red); border-color:var(--red)">Полный сброс</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script src="js/data/ot-questions.js"></script>

@@ -6,11 +6,14 @@ const STORAGE_KEY = "nbbQuiz_v6";
 function emptySubjectProgress(){
   return { totalAnswered:0, totalCorrect:0, byBook:{}, byCategory:{}, rounds:[], streak:0, bestStreak:0 };
 }
+
 function defaultProgress(){
   return {
     ot: emptySubjectProgress(),
     bs: emptySubjectProgress(),
-    settings: { theme: 'auto' }
+    settings: { theme: 'auto', sound: true, vibration: true, shuffleAnswers: true },
+    totalTime: 0,
+    dailyActivity: {}
   };
 }
 
@@ -24,7 +27,9 @@ NBB.progress.load = function(){
     const p = defaultProgress();
     if(saved.ot) p.ot = Object.assign(emptySubjectProgress(), saved.ot);
     if(saved.bs) p.bs = Object.assign(emptySubjectProgress(), saved.bs);
-    if(saved.settings) p.settings = Object.assign({ theme: 'auto' }, saved.settings);
+    if(saved.settings) p.settings = Object.assign({ theme: 'auto', sound: true, vibration: true, shuffleAnswers: true }, saved.settings);
+    if(saved.totalTime) p.totalTime = saved.totalTime;
+    if(saved.dailyActivity) p.dailyActivity = saved.dailyActivity;
     return p;
   }catch(e){ return defaultProgress(); }
 };
@@ -43,6 +48,18 @@ NBB.progress.recordAnswer = function(subject, book, category, isCorrect){
   p.byCategory[category].a++; if(isCorrect) p.byCategory[category].c++;
   if(isCorrect){ p.streak++; if(p.streak>p.bestStreak) p.bestStreak=p.streak; }
   else p.streak = 0;
+
+  // Записываем активность по дням (для heatmap)
+  const today = new Date().toISOString().slice(0,10);
+  if(!NBB.state.progress.dailyActivity) NBB.state.progress.dailyActivity = {};
+  NBB.state.progress.dailyActivity[today] = (NBB.state.progress.dailyActivity[today] || 0) + 1;
+
+  NBB.progress.save();
+};
+
+NBB.progress.recordTime = function(ms){
+  if(!NBB.state.progress.totalTime) NBB.state.progress.totalTime = 0;
+  NBB.state.progress.totalTime += ms;
   NBB.progress.save();
 };
 

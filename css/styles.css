@@ -285,3 +285,81 @@
     .subject-icon { font-size: 32px; }
     .subject-name { font-size: 17px; }
   }
+
+
+  /* ============ МОДАЛКА ============ */
+.modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+    display: flex; align-items: center; justify-content: center; z-index: 1000;
+    padding: 16px; backdrop-filter: blur(3px);
+  }
+  .modal {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 18px;
+    max-width: 480px; width: 100%; padding: 24px; box-shadow: var(--shadow-card);
+    max-height: 90vh; overflow-y: auto;
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-header h2 { margin: 0; font-size: 20px; }
+  .modal-close { background: none; border: none; color: var(--muted); font-size: 28px; line-height: 1; cursor: pointer; padding: 0 4px; }
+  .modal-close:hover { color: var(--text); }
+  .settings-row { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .settings-row:last-child { border-bottom: none; }
+  .settings-row select { width: auto; min-width: 120px; padding: 6px 10px; min-height: 36px; font-size: 14px; }
+  
+  /* Переключатель */
+  .toggle { position: relative; display: inline-block; width: 44px; height: 24px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle .slider { position: absolute; inset: 0; background: var(--track-bg); border-radius: 24px; transition: .2s; cursor: pointer; }
+  .toggle .slider::before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .2s; }
+  .toggle input:checked + .slider { background: var(--gold); }
+  .toggle input:checked + .slider::before { transform: translateX(20px); }
+  
+  /* ============ ГРАФИКИ ============ */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .stat-card h4 { margin: 0 0 12px; font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  @media (max-width: 640px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .stat-card[style*="span 2"] { grid-column: span 1 !important; }
+  }
+  
+  /* Heatmap */
+  .heatmap-wrapper { overflow-x: auto; padding-bottom: 8px; }
+  .heatmap { display: grid; grid-auto-flow: column; grid-template-rows: repeat(7, 1fr); gap: 3px; width: max-content; }
+  .heatmap-day { width: 12px; height: 12px; border-radius: 2px; background: var(--track-bg); }
+  .heatmap-day[data-level="1"] { background: color-mix(in srgb, var(--green) 30%, var(--track-bg)); }
+  .heatmap-day[data-level="2"] { background: color-mix(in srgb, var(--green) 50%, var(--track-bg)); }
+  .heatmap-day[data-level="3"] { background: color-mix(in srgb, var(--green) 70%, var(--track-bg)); }
+  .heatmap-day[data-level="4"] { background: var(--green); }
+  
+  /* Radar и Line */
+  .radar-chart { width: 100%; height: 240px; display: block; }
+  .line-chart { width: 100%; height: 180px; display: block; }
+  
+  /* ============ АНИМАЦИИ ОТВЕТОВ ============ */
+  @keyframes pulseGreen {
+    0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--green) 50%, transparent); }
+    100% { box-shadow: 0 0 0 12px transparent; }
+  }
+  .answer.correct { animation: pulseGreen .6s ease-out; }
+  
+  @keyframes shakeRed {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-6px); }
+    40% { transform: translateX(6px); }
+    60% { transform: translateX(-4px); }
+    80% { transform: translateX(4px); }
+  }
+  .answer.wrong { animation: shakeRed .4s ease-out; }
+  
+  /* Блеск прогресс-бара */
+  @keyframes shine {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+  .fill { position: relative; overflow: hidden; }
+  .fill::after {
+    content: ""; position: absolute; top: 0; bottom: 0; left: 0; width: 50%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    animation: shine 2.5s infinite;
+  }

@@ -40,7 +40,6 @@ function getShuffledRightOrder(q){
   return order;
 }
 
-// ==== СТАРТ ====
 NBB.game.start = function(){
   if(!NBB.state.currentSubject) return;
 
@@ -68,7 +67,7 @@ NBB.game.start = function(){
   if(mode !== 'mixed' && count !== 'all') pool = pool.slice(0, Number(count));
 
   if(!pool.length){
-    alert('Для выбранного режима и фильтра нет вопросов. Попробуй расширить выбор или сменить режим.');
+    alert('Для выбранного режима и фильтра нет вопросов. Попробуй расширить выбор.');
     return;
   }
 
@@ -77,6 +76,7 @@ NBB.game.start = function(){
   NBB.state.correct = 0;
   NBB.state.mistakes = [];
   NBB.state.matchState = null;
+  NBB.state.questionStartTime = Date.now();
 
   NBB.ui.hide('intro');
   NBB.ui.hide('result');
@@ -85,34 +85,31 @@ NBB.game.start = function(){
   NBB.game.render();
 };
 
-// ==== РЕНДЕР ТЕКУЩЕГО ВОПРОСА ====
 NBB.game.render = function(){
   const q = NBB.state.round[NBB.state.index];
   NBB.state.answered = false;
   NBB.state.matchState = null;
+  NBB.state.questionStartTime = Date.now();
 
-  document.getElementById('progressText').textContent =
-    `Вопрос ${NBB.state.index + 1} из ${NBB.state.round.length}`;
+  document.getElementById('progressText').textContent = `Вопрос ${NBB.state.index + 1} из ${NBB.state.round.length}`;
   document.getElementById('scoreText').textContent = `Верно: ${NBB.state.correct}`;
-  document.getElementById('fill').style.width =
-    `${NBB.state.index / NBB.state.round.length * 100}%`;
+  document.getElementById('fill').style.width = `${NBB.state.index / NBB.state.round.length * 100}%`;
   document.getElementById('bookTag').textContent = q.book;
   document.getElementById('categoryTag').textContent = q.category;
-  document.getElementById('qnum').textContent =
-    `ВОПРОС ${String(NBB.state.index + 1).padStart(2,'0')}${q.type === 'match' ? ' · СОПОСТАВЛЕНИЕ' : ''}`;
+  document.getElementById('qnum').textContent = `ВОПРОС ${String(NBB.state.index + 1).padStart(2,'0')}${q.type === 'match' ? ' · СОПОСТАВЛЕНИЕ' : ''}`;
   document.getElementById('question').textContent = q.q;
   document.getElementById('feedback').className = 'feedback hidden';
   document.getElementById('feedback').textContent = '';
   document.getElementById('next').disabled = true;
-  document.getElementById('next').textContent =
-    NBB.state.index === NBB.state.round.length - 1 ? 'Показать результат' : 'Следующий →';
+  document.getElementById('next').textContent = NBB.state.index === NBB.state.round.length - 1 ? 'Показать результат' : 'Следующий →';
 
   if(window.scrollY > 80) window.scrollTo({top:0, behavior:'smooth'});
 
   if(q.type === 'match'){
     NBB.game.renderMatch(q);
   } else {
-    const order = getShuffledOrder(q);
+    const shuffleOn = !NBB.state.progress.settings || NBB.state.progress.settings.shuffleAnswers !== false;
+    const order = shuffleOn ? getShuffledOrder(q) : [0,1,2,3];
     const shuffledA = order.map(i => q.a[i]);
     const newCorrect = order.indexOf(q.correct);
     q._shuffled = shuffledA;
@@ -127,24 +124,12 @@ NBB.game.render = function(){
   }
 };
 
-// ==== СОПОСТАВЛЕНИЕ ====
 NBB.game.renderMatch = function(q){
   const rightOrder = getShuffledRightOrder(q);
-  NBB.state.matchState = {
-    pairs: q.pairs,
-    rightOrder,
-    matchedLeft: new Set(),
-    matchedRight: new Set(),
-    selectedLeft: null,
-    correctCount: 0
-  };
+  NBB.state.matchState = { pairs: q.pairs, rightOrder, matchedLeft: new Set(), matchedRight: new Set(), selectedLeft: null, correctCount: 0 };
 
-  const leftHTML = q.pairs.map((p, i) =>
-    `<button type="button" class="match-item" data-side="left" data-idx="${i}">${p.left}</button>`
-  ).join('');
-  const rightHTML = rightOrder.map(i =>
-    `<button type="button" class="match-item" data-side="right" data-idx="${i}">${q.pairs[i].right}</button>`
-  ).join('');
+  const leftHTML = q.pairs.map((p, i) => `<button type="button" class="match-item" data-side="left" data-idx="${i}">${p.left}</button>`).join('');
+  const rightHTML = rightOrder.map(i => `<button type="button" class="match-item" data-side="right" data-idx="${i}">${q.pairs[i].right}</button>`).join('');
 
   document.getElementById('answers').innerHTML = `
     <div class="match-wrap">
@@ -158,21 +143,14 @@ NBB.game.renderMatch = function(q){
       <div class="match-hint">${IS_MOBILE() ? 'Выбери элемент в верхнем списке, затем пару в нижнем ↓' : 'Кликни по элементу слева, затем по соответствующему справа'}</div>
     </div>`;
 
-  document.getElementById('answers').querySelectorAll('.match-item').forEach(el =>
-    el.addEventListener('click', NBB.game.onMatchClick)
-  );
+  document.getElementById('answers').querySelectorAll('.match-item').forEach(el => el.addEventListener('click', NBB.game.onMatchClick));
 };
 
 function updateSelectionBanner(text){
   const bar = document.getElementById('matchSelBar');
   if(!bar) return;
-  if(text){
-    bar.classList.add('active');
-    bar.innerHTML = `Выбрано: <strong>${text}</strong><span style="color:var(--muted);font-weight:normal">↓ теперь выберите пару ниже</span>`;
-  } else {
-    bar.classList.remove('active');
-    bar.innerHTML = '';
-  }
+  if(text){ bar.classList.add('active'); bar.innerHTML = `Выбрано: <strong>${text}</strong><span style="color:var(--muted);font-weight:normal">↓ теперь выберите пару ниже</span>`; }
+  else { bar.classList.remove('active'); bar.innerHTML = ''; }
 }
 
 NBB.game.onMatchClick = function(e){
@@ -210,11 +188,11 @@ NBB.game.onMatchClick = function(e){
     const st = document.getElementById('matchStatus');
     if(st) st.textContent = `Совпадений: ${ms.correctCount} из ${ms.pairs.length}`;
 
+    NBB.ui.playSound('correct');
+    NBB.ui.vibrate(20);
+
     if(IS_MOBILE() && ms.correctCount < ms.pairs.length){
-      setTimeout(() => {
-        const w = document.querySelector('.match-wrap');
-        if(w) w.scrollIntoView({behavior:'smooth', block:'start'});
-      }, 250);
+      setTimeout(() => { const w = document.querySelector('.match-wrap'); if(w) w.scrollIntoView({behavior:'smooth', block:'start'}); }, 250);
     }
     if(ms.correctCount === ms.pairs.length) NBB.game.finishMatch();
   } else {
@@ -225,13 +203,16 @@ NBB.game.onMatchClick = function(e){
       el.classList.remove('wrong-flash');
       if(leftEl) leftEl.classList.remove('wrong-flash');
     }, 500);
-    if(navigator.vibrate) navigator.vibrate(60);
+    NBB.ui.playSound('wrong');
+    NBB.ui.vibrate(60);
   }
 };
 
 NBB.game.finishMatch = function(){
   NBB.state.answered = true;
   const q = NBB.state.round[NBB.state.index];
+  const elapsed = Date.now() - NBB.state.questionStartTime;
+  NBB.progress.recordTime(elapsed);
   NBB.progress.recordAnswer(NBB.state.currentSubject, q.book, q.category, true);
   NBB.state.correct++;
 
@@ -241,13 +222,16 @@ NBB.game.finishMatch = function(){
   fb.innerHTML = `<strong>✅ Все пары найдены верно!</strong><span>${q.why || ''}</span>`;
   document.getElementById('scoreText').textContent = `Верно: ${NBB.state.correct}`;
   document.getElementById('next').disabled = false;
-  if(navigator.vibrate) navigator.vibrate([40,40,40]);
+  NBB.ui.playSound('correct');
+  NBB.ui.vibrate([40, 40, 40]);
 };
 
-// ==== ОБЫЧНЫЙ ВОПРОС ====
 NBB.game.choose = function(n){
   if(NBB.state.answered) return;
   NBB.state.answered = true;
+
+  const elapsed = Date.now() - NBB.state.questionStartTime;
+  NBB.progress.recordTime(elapsed);
 
   const q = NBB.state.round[NBB.state.index];
   const good = n === q._correct;
@@ -269,14 +253,15 @@ NBB.game.choose = function(n){
   document.getElementById('scoreText').textContent = `Верно: ${NBB.state.correct}`;
   document.getElementById('next').disabled = false;
 
-  if(navigator.vibrate) navigator.vibrate(good ? 30 : [40,40]);
+  NBB.ui.playSound(good ? 'correct' : 'wrong');
+  NBB.ui.vibrate(good ? 30 : [40, 40]);
+
   if(IS_MOBILE()) setTimeout(() => fb.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
 };
 
-// ==== ФИНАЛ ====
 NBB.game.finish = function(){
-    NBB.ui.hide('game');
-    NBB.ui.show('result');
+  NBB.ui.hide('game');
+  NBB.ui.show('result');
 
   const pct = Math.round(NBB.state.correct / NBB.state.round.length * 100);
   document.getElementById('finalScore').textContent = `${pct}%`;
@@ -290,19 +275,12 @@ NBB.game.finish = function(){
 
   document.getElementById('missed').innerHTML = NBB.state.mistakes.length
     ? `<h3>Что стоит повторить</h3>` + NBB.state.mistakes.map(m => {
-        if(m.q.type === 'match'){
-          return `<div class="feedback bad"><strong>${m.q.q}</strong><div class="small">${m.q.why || ''}</div></div>`;
-        }
+        if(m.q.type === 'match') return `<div class="feedback bad"><strong>${m.q.q}</strong><div class="small">${m.q.why || ''}</div></div>`;
         return `<div class="feedback bad"><strong>${m.q.book}: ${m.q.q}</strong><div>Правильный ответ: ${m.q.a[m.q.correct]}</div><div class="small">${m.q.why}</div></div>`;
       }).join('')
     : '<h3>Без ошибок — так держать!</h3>';
 
-  NBB.progress.recordRound(NBB.state.currentSubject, {
-    ts: Date.now(),
-    mode: NBB.state.roundMode,
-    total: NBB.state.round.length,
-    correct: NBB.state.correct
-  });
+  NBB.progress.recordRound(NBB.state.currentSubject, { ts: Date.now(), mode: NBB.state.roundMode, total: NBB.state.round.length, correct: NBB.state.correct });
   NBB.ui.renderProgressPanel();
   window.scrollTo({top:0, behavior:'smooth'});
 };
