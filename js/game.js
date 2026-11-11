@@ -78,9 +78,9 @@ NBB.game.start = function(){
   NBB.state.mistakes = [];
   NBB.state.matchState = null;
 
-  document.getElementById('intro').classList.add('hidden');
-  document.getElementById('result').classList.add('hidden');
-  document.getElementById('game').classList.remove('hidden');
+  NBB.ui.hide('intro');
+  NBB.ui.hide('result');
+  NBB.ui.show('game');
 
   NBB.game.render();
 };
@@ -275,8 +275,8 @@ NBB.game.choose = function(n){
 
 // ==== ФИНАЛ ====
 NBB.game.finish = function(){
-  document.getElementById('game').classList.add('hidden');
-  document.getElementById('result').classList.remove('hidden');
+    NBB.ui.hide('game');
+    NBB.ui.show('result');
 
   const pct = Math.round(NBB.state.correct / NBB.state.round.length * 100);
   document.getElementById('finalScore').textContent = `${pct}%`;

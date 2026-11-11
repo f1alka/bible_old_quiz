@@ -1,7 +1,37 @@
 window.NBB = window.NBB || {};
 NBB.ui = {};
 
-// ==== ПОЛУЧИТЬ ТЕКУЩИЕ СПИСКИ ====
+// ==== УТИЛИТЫ ПОКАЗА/СКРЫТИЯ ====
+// Используем inline style — работает даже если .hidden в CSS отсутствует или переопределён
+function show(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('hidden');
+  el.style.display = '';
+}
+function hide(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.add('hidden');
+  el.style.display = 'none';
+}
+NBB.ui.show = show;
+NBB.ui.hide = hide;
+
+// ==== ФАТАЛЬНАЯ ОШИБКА ====
+function showFatalError(msg){
+  let banner = document.getElementById('_fatalErr');
+  if(!banner){
+    banner = document.createElement('div');
+    banner.id = '_fatalErr';
+    banner.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#8a444a;color:#fff;padding:14px 18px;font:14px/1.4 system-ui;z-index:9999;text-align:center;box-shadow:0 4px 12px #0008';
+    document.body.appendChild(banner);
+  }
+  banner.textContent = '⚠ ' + msg;
+}
+NBB.ui.showFatalError = showFatalError;
+
+// ==== СПИСКИ ПО ТЕКУЩЕМУ ПРЕДМЕТУ ====
 NBB.ui.getBooks = function(){
   return NBB.state.currentSubject === 'ot' ? NBB.data.BOOKS_OT : NBB.data.BOOKS_BS;
 };
@@ -12,7 +42,7 @@ NBB.ui.getModes = function(){
   return NBB.state.currentSubject === 'ot' ? NBB.data.MODES_OT : NBB.data.MODES_BS;
 };
 
-// ==== ФИЛЬТР ПО КНИГАМ ====
+// ==== ФИЛЬТР ====
 function bookMatches(q, selectedSet){
   if(selectedSet.size === 0) return true;
   if(q.type === "match"){
@@ -38,12 +68,13 @@ NBB.ui.updateHeader = function(){
   }
 };
 
-// ==== СТАТИСТИКА МЕНЮ ====
+// ==== СТАТИСТИКА В МЕНЮ ====
 NBB.ui.renderSubjectStats = function(){
+  if(!NBB.state.progress) return;
   ['ot','bs'].forEach(s => {
     const p = NBB.state.progress[s];
     const el = document.getElementById('stats_' + s);
-    if(!el) return;
+    if(!el || !p) return;
     if(p.totalAnswered){
       el.textContent = `${p.totalCorrect}/${p.totalAnswered} правильных (${Math.round(p.totalCorrect/p.totalAnswered*100)}%) · ${p.rounds.length} раундов`;
     } else {
@@ -54,57 +85,89 @@ NBB.ui.renderSubjectStats = function(){
 
 // ==== ВЫБОР ПРЕДМЕТА ====
 NBB.ui.selectSubject = function(subj){
-  if(!NBB.data.SUBJECTS[subj]) return;
-  NBB.state.currentSubject = subj;
-  NBB.state.selectedBooks.clear();
+  console.log('[selectSubject] вход, subj =', subj);
+  try {
+    // 1) Проверки
+    if(!NBB.data || !NBB.data.SUBJECTS) throw new Error('NBB.data.SUBJECTS не загружен (проверьте js/data/constants.js)');
+    if(!NBB.data.SUBJECTS[subj]) throw new Error('Предмет не найден: ' + subj);
+    if(!NBB.state.progress) throw new Error('NBB.state.progress не инициализирован (проверьте js/progress.js)');
 
-  const meta = NBB.data.SUBJECTS[subj];
-  NBB.ui.updateHeader();
+    // 2) Состояние
+    NBB.state.currentSubject = subj;
+    if(NBB.state.selectedBooks) NBB.state.selectedBooks.clear();
 
-  document.getElementById('introBrand').textContent = meta.name;
-  document.getElementById('introTitle').textContent = meta.name;
-  document.getElementById('introSub').textContent = meta.sub;
-  document.getElementById('introNotice').textContent = meta.notice;
-  document.getElementById('filterLabel').textContent = meta.filterLabel;
-  document.getElementById('listTitle').textContent = meta.listTitle;
-  document.getElementById('listSub').textContent = meta.listSub;
+    const meta = NBB.data.SUBJECTS[subj];
+    NBB.ui.updateHeader();
 
-  document.getElementById('mode').innerHTML = NBB.ui.getModes()
-    .map(m => `<option value="${m.v}">${m.l}</option>`).join('');
+    // 3) Тексты
+    const setText = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+    setText('introBrand', meta.name);
+    setText('introTitle', meta.name);
+    setText('introSub', meta.sub);
+    setText('introNotice', meta.notice);
+    setText('filterLabel', meta.filterLabel);
+    setText('listTitle', meta.listTitle);
+    setText('listSub', meta.listSub);
 
-  const books = NBB.ui.getBooks();
-  document.getElementById('booklist').innerHTML = books
-    .map(b => `<div class="book"><span>${b}</span><span class="bar" data-book="${b}"></span></div>`).join('');
+    // 4) Режимы
+    const modeEl = document.getElementById('mode');
+    if(!modeEl) throw new Error('Элемент #mode не найден в HTML');
+    const modes = NBB.ui.getModes();
+    if(!modes || !modes.length) throw new Error('MODES для предмета не найдены');
+    modeEl.innerHTML = modes.map(m => `<option value="${m.v}">${m.l}</option>`).join('');
 
-  NBB.ui.renderCategoryButtons();
-  NBB.ui.renderBookFilter();
-  NBB.ui.renderProgressPanel();
+    // 5) Список книг/глав
+    const listEl = document.getElementById('booklist');
+    if(!listEl) throw new Error('Элемент #booklist не найден в HTML');
+    const books = NBB.ui.getBooks();
+    if(!books || !books.length) throw new Error('BOOKS для предмета не найдены');
+    listEl.innerHTML = books.map(b =>
+      `<div class="book"><span>${b}</span><span class="bar" data-book="${b}"></span></div>`
+    ).join('');
 
-  document.getElementById('subjectSelect').classList.add('hidden');
-  document.getElementById('game').classList.add('hidden');
-  document.getElementById('result').classList.add('hidden');
-  document.getElementById('intro').classList.remove('hidden');
+    // 6) Отрисовка фильтра
+    NBB.ui.renderCategoryButtons();
+    NBB.ui.renderBookFilter();
+    NBB.ui.renderProgressPanel();
 
-  NBB.ui.onBookSelectionChange();
-  window.scrollTo({top:0, behavior:'smooth'});
+    // 7) Показ/скрытие — через inline style
+    hide('subjectSelect');
+    hide('game');
+    hide('result');
+    show('intro');
+
+    NBB.ui.onBookSelectionChange();
+    window.scrollTo({top:0, behavior:'smooth'});
+    console.log('[selectSubject] OK');
+  } catch(e){
+    console.error('[selectSubject] ОШИБКА:', e);
+    showFatalError('Не удалось открыть предмет: ' + e.message);
+  }
 };
 
 NBB.ui.backToSubject = function(){
-  NBB.state.currentSubject = null;
-  NBB.state.selectedBooks.clear();
-  NBB.ui.updateHeader();
-  document.getElementById('subjectSelect').classList.remove('hidden');
-  document.getElementById('intro').classList.add('hidden');
-  document.getElementById('game').classList.add('hidden');
-  document.getElementById('result').classList.add('hidden');
-  NBB.ui.renderSubjectStats();
-  window.scrollTo({top:0, behavior:'smooth'});
+  try {
+    NBB.state.currentSubject = null;
+    if(NBB.state.selectedBooks) NBB.state.selectedBooks.clear();
+    NBB.ui.updateHeader();
+    show('subjectSelect');
+    hide('intro');
+    hide('game');
+    hide('result');
+    NBB.ui.renderSubjectStats();
+    window.scrollTo({top:0, behavior:'smooth'});
+  } catch(e){
+    console.error('[backToSubject] ОШИБКА:', e);
+    showFatalError('Не удалось вернуться в меню: ' + e.message);
+  }
 };
 
 // ==== КАТЕГОРИИ ====
 NBB.ui.renderCategoryButtons = function(){
-  const cats = NBB.ui.getCategories();
   const box = document.getElementById('catButtons');
+  if(!box) return;
+  const cats = NBB.ui.getCategories();
+  if(!cats) return;
   box.innerHTML = Object.keys(cats).map(cat => {
     const n = cats[cat].length;
     return `<button type="button" class="cat-btn" data-cat="${cat}">${cat}<span class="cnt">${n}</span></button>`;
@@ -114,14 +177,16 @@ NBB.ui.renderCategoryButtons = function(){
       const cat = btn.dataset.cat;
       const books = cats[cat];
       const allSel = books.every(b => NBB.state.selectedBooks.has(b));
+      const filterBox = document.getElementById('bookFilter');
+      if(!filterBox) return;
       if(allSel){
         books.forEach(b => NBB.state.selectedBooks.delete(b));
-        box.parentElement.querySelectorAll('#bookFilter .book-chip').forEach(el => {
+        filterBox.querySelectorAll('.book-chip').forEach(el => {
           if(books.includes(el.dataset.book)) el.classList.remove('selected');
         });
       } else {
         books.forEach(b => NBB.state.selectedBooks.add(b));
-        box.parentElement.querySelectorAll('#bookFilter .book-chip').forEach(el => {
+        filterBox.querySelectorAll('.book-chip').forEach(el => {
           if(books.includes(el.dataset.book)) el.classList.add('selected');
         });
       }
@@ -132,6 +197,7 @@ NBB.ui.renderCategoryButtons = function(){
 
 NBB.ui.updateCategoryButtonsState = function(){
   const cats = NBB.ui.getCategories();
+  if(!cats) return;
   document.querySelectorAll('#catButtons .cat-btn').forEach(btn => {
     const cat = btn.dataset.cat;
     const books = cats[cat];
@@ -144,9 +210,13 @@ NBB.ui.updateCategoryButtonsState = function(){
 
 // ==== ЧИПЫ КНИГ ====
 NBB.ui.renderBookFilter = function(){
-  const books = NBB.ui.getBooks();
   const box = document.getElementById('bookFilter');
-  box.innerHTML = books.map(b => `<button type="button" class="book-chip" data-book="${b}">${b}</button>`).join('');
+  if(!box) return;
+  const books = NBB.ui.getBooks();
+  if(!books) return;
+  box.innerHTML = books.map(b =>
+    `<button type="button" class="book-chip" data-book="${b}">${b}</button>`
+  ).join('');
   box.querySelectorAll('.book-chip').forEach(el => {
     el.addEventListener('click', () => {
       const b = el.dataset.book;
@@ -174,26 +244,33 @@ NBB.ui.onBookSelectionChange = function(){
   if(!NBB.state.currentSubject) return;
   const total = NBB.ui.getBooks().length;
   const n = NBB.state.selectedBooks.size;
-  document.getElementById('selectedCount').textContent =
-    n === 0 ? `выбрано: 0 (всё)` :
-    (n === total ? `выбрано: все ${n}` : `выбрано: ${n} из ${total}`);
+  const countEl = document.getElementById('selectedCount');
+  if(countEl){
+    countEl.textContent =
+      n === 0 ? `выбрано: 0 (всё)` :
+      (n === total ? `выбрано: все ${n}` : `выбрано: ${n} из ${total}`);
+  }
   NBB.ui.updateCategoryButtonsState();
-  const available = NBB.ui.filterBySubjectAndBooks(NBB.data.all);
-  document.getElementById('totalLabel').textContent =
-    `Доступно вопросов: ${available.length}${n > 0 ? " (по выбранному)" : " (всё)"}`;
+  const available = NBB.ui.filterBySubjectAndBooks(NBB.data.all || []);
+  const labelEl = document.getElementById('totalLabel');
+  if(labelEl){
+    labelEl.textContent = `Доступно вопросов: ${available.length}${n > 0 ? " (по выбранному)" : " (всё)"}`;
+  }
 };
 
 // ==== ПРОГРЕСС-ПАНЕЛЬ ====
 NBB.ui.renderProgressPanel = function(){
-  if(!NBB.state.currentSubject) return;
+  if(!NBB.state.currentSubject || !NBB.state.progress) return;
   const p = NBB.state.progress[NBB.state.currentSubject];
-  document.getElementById('pTotalAns').textContent = p.totalAnswered;
-  document.getElementById('pTotalCor').textContent = p.totalCorrect;
+  if(!p) return;
+  const setNum = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  setNum('pTotalAns', p.totalAnswered);
+  setNum('pTotalCor', p.totalCorrect);
   const acc = p.totalAnswered ? Math.round(p.totalCorrect / p.totalAnswered * 100) : 0;
-  document.getElementById('pAcc').textContent = p.totalAnswered ? acc + '%' : '—';
-  document.getElementById('pRounds').textContent = p.rounds.length;
+  setNum('pAcc', p.totalAnswered ? acc + '%' : '—');
+  setNum('pRounds', p.rounds.length);
 
-  const entries = Object.entries(p.byBook)
+  const entries = Object.entries(p.byBook || {})
     .filter(([,v]) => v.a > 0)
     .sort((a,b) => (b[1].c/b[1].a) - (a[1].c/a[1].a));
   const top = entries.slice(0, 12);
@@ -209,21 +286,24 @@ NBB.ui.renderProgressPanel = function(){
   } else {
     detail = `<p class="small">Начни игру — здесь появится статистика по разделам и категориям.</p>`;
   }
-  document.getElementById('progressDetail').innerHTML = detail;
+  const pd = document.getElementById('progressDetail');
+  if(pd) pd.innerHTML = detail;
 
-  if(p.rounds.length){
-    document.getElementById('historyList').innerHTML =
-      `<h4 style="margin:14px 0 6px">🕘 История раундов</h4>` +
-      p.rounds.slice(0,5).map(r =>
-        `<div class="history-item"><span>${r.mode} · ${r.correct}/${r.total} <span class="badge">${Math.round(r.correct/r.total*100)}%</span></span><span class="date">${new Date(r.ts).toLocaleDateString('ru-RU')}</span></div>`
-      ).join('');
-  } else {
-    document.getElementById('historyList').innerHTML = '';
+  const hl = document.getElementById('historyList');
+  if(hl){
+    if(p.rounds && p.rounds.length){
+      hl.innerHTML = `<h4 style="margin:14px 0 6px">🕘 История раундов</h4>` +
+        p.rounds.slice(0,5).map(r =>
+          `<div class="history-item"><span>${r.mode} · ${r.correct}/${r.total} <span class="badge">${Math.round(r.correct/r.total*100)}%</span></span><span class="date">${new Date(r.ts).toLocaleDateString('ru-RU')}</span></div>`
+        ).join('');
+    } else {
+      hl.innerHTML = '';
+    }
   }
 
   document.querySelectorAll('.bar[data-book]').forEach(el => {
     const b = el.dataset.book;
-    const v = p.byBook[b];
+    const v = p.byBook && p.byBook[b];
     if(v && v.a){
       el.textContent = `${Math.round(v.c/v.a*100)}%`;
       el.style.color = v.c/v.a >= 0.7 ? '#49c58b' : '#e6bd70';
@@ -233,9 +313,8 @@ NBB.ui.renderProgressPanel = function(){
   });
 };
 
-// ==== СБРОС ПРОГРЕССА ====
 NBB.ui.resetProgress = function(){
-  if(!NBB.state.currentSubject) return;
+  if(!NBB.state.currentSubject || !NBB.state.progress) return;
   if(confirm(`Сбросить прогресс по предмету «${NBB.data.SUBJECTS[NBB.state.currentSubject].name}»?`)){
     NBB.state.progress[NBB.state.currentSubject] = NBB.progress.empty();
     NBB.progress.save();

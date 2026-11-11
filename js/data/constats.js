@@ -1,19 +1,29 @@
 window.NBB = window.NBB || {};
 window.NBB.data = window.NBB.data || {};
 
-// ==== ТЕГИ ====
-NBB.data.otQuestions.forEach(q => { q.subject = 'ot'; q.type = 'single'; });
-NBB.data.otMatch.forEach(q => { q.subject = 'ot'; q.type = 'match'; });
-NBB.data.bsQuestions.forEach(q => { q.subject = 'bs'; q.type = 'single'; });
-NBB.data.bsMatch.forEach(q => { q.subject = 'bs'; q.type = 'match'; });
+// ==== ТЕГИ (с проверкой) ====
+function tag(arr, subject, type){
+  if(Array.isArray(arr)){
+    arr.forEach(q => { q.subject = subject; q.type = type; });
+    return arr;
+  }
+  console.warn('[constants] Массив не загружен:', subject, type);
+  return [];
+}
+
+const otQ = tag(NBB.data.otQuestions, 'ot', 'single');
+const otM = tag(NBB.data.otMatch,     'ot', 'match');
+const bsQ = tag(NBB.data.bsQuestions, 'bs', 'single');
+const bsM = tag(NBB.data.bsMatch,     'bs', 'match');
+
+// Возвращаем обратно (на случай, если массивы не были определены в data/*.js)
+NBB.data.otQuestions = otQ;
+NBB.data.otMatch     = otM;
+NBB.data.bsQuestions = bsQ;
+NBB.data.bsMatch     = bsM;
 
 // ==== ОБЩИЙ БАНК ====
-NBB.data.all = [
-  ...NBB.data.otQuestions,
-  ...NBB.data.otMatch,
-  ...NBB.data.bsQuestions,
-  ...NBB.data.bsMatch
-];
+NBB.data.all = [...otQ, ...otM, ...bsQ, ...bsM];
 
 // ==== ПРЕДМЕТЫ ====
 NBB.data.SUBJECTS = {
@@ -78,3 +88,7 @@ NBB.data.CATEGORIES_BS = {
 };
 
 NBB.data.LETTERS = ["А","Б","В","Г"];
+
+console.log('[constants] Загружено: ОВЗ =', NBB.data.otQuestions.length,
+            '| ОИБ =', NBB.data.bsQuestions.length,
+            '| матчей =', NBB.data.otMatch.length + NBB.data.bsMatch.length);
