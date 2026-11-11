@@ -1,997 +1,132 @@
-<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101b2b"><title>Тренажёр НББС</title>
-<style>
-:root{--bg:#0b1220;--panel:#121e30;--text:#f3f6fb;--muted:#aab7c9;--gold:#e6bd70;--green:#49c58b;--red:#ff7777;--blue:#6fb3ff;--line:#2a3a51}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:radial-gradient(ellipse at top,#1b2d45 0,#0b1220 55%);color:var(--text);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh;overscroll-behavior-y:contain}
-.wrap{max-width:960px;margin:auto;padding:24px 16px 50px}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;flex-wrap:wrap}
-.brand{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);font-weight:800}
-h1{font-size:clamp(28px,5vw,44px);line-height:1.08;margin:8px 0}
-h2{font-size:clamp(22px,4vw,32px);line-height:1.15;margin:8px 0}
-.sub{color:var(--muted);max-width:700px}
-.pill{border:1px solid #52627a;border-radius:999px;padding:6px 11px;color:#d9e3f1;font-size:12px;white-space:nowrap}
-.pill-btn{cursor:pointer;background:#243750;color:var(--text)}
-.pill-btn:hover{border-color:var(--gold)}
-.card{background:linear-gradient(145deg,rgba(24,39,60,.97),rgba(16,28,44,.97));border:1px solid var(--line);border-radius:22px;padding:clamp(18px,4vw,30px);box-shadow:0 18px 60px #0005}
-.setup-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:22px 0}
-label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
-select{width:100%;background:#0d1828;color:var(--text);border:1px solid var(--line);padding:12px;border-radius:12px;font-size:16px;min-height:48px}
-button{font:inherit;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none}
-.primary,.secondary{border:0;border-radius:13px;padding:13px 18px;font-weight:750;min-height:48px}
-.primary{background:var(--gold);color:#172033}.primary:hover{filter:brightness(1.07)}.primary:active{transform:scale(.98)}
-.secondary{background:#243750;color:var(--text);border:1px solid #40536c}.secondary:active{transform:scale(.98)}
-.startrow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.small{font-size:13px;color:var(--muted)}
-.stats{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px;margin-bottom:10px}
-.track{height:7px;background:#29384d;border-radius:20px;overflow:hidden;margin-bottom:24px}
-.fill{height:100%;width:0;background:var(--gold);transition:width .25s}
-.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
-.tag{font-size:12px;color:var(--gold);background:#473a24;border:1px solid #76603a;padding:4px 9px;border-radius:999px}
-.tag.blue{color:var(--blue);background:#1c2d44;border-color:#3c5a80}
-.qnum{color:var(--muted);font-size:13px;margin-bottom:8px}
-.question{font-size:clamp(21px,3.7vw,29px);font-weight:750;line-height:1.25;margin:0 0 22px}
-.answers{display:grid;gap:11px}
-.answer{width:100%;text-align:left;display:flex;gap:12px;align-items:flex-start;background:#0e1a2b;border:1px solid #31445d;color:var(--text);border-radius:14px;padding:14px;transition:.15s;min-height:56px;font-size:15px;font-family:inherit}
-.answer:hover:not(:disabled){border-color:var(--gold);transform:translateY(-1px)}
-.answer:active:not(:disabled){transform:scale(.99)}
-.letter{flex:0 0 27px;height:27px;border-radius:8px;background:#263950;display:grid;place-items:center;font-weight:800;color:#dce5f2}
-.answer.correct{border-color:var(--green);background:#12372e}.answer.correct .letter{background:var(--green);color:#09251b}
-.answer.wrong{border-color:var(--red);background:#3c2028}.answer.wrong .letter{background:var(--red);color:#301018}
-.answer:disabled{cursor:default;opacity:1}
-.feedback{margin-top:16px;border-radius:14px;padding:14px;background:#0d1828;border:1px solid var(--line);font-size:15px;line-height:1.45}
-.feedback.good{border-color:#267b5a}.feedback.bad{border-color:#8a444a}.feedback strong{display:block;margin-bottom:4px}
-.controls{display:flex;justify-content:space-between;gap:10px;margin-top:20px;flex-wrap:wrap}
-.hidden{display:none!important}.result{text-align:center}.score{font-size:58px;font-weight:850;color:var(--gold);line-height:1.1;margin:12px}
-.booklist{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:18px}
-.book{background:#0e1a2b;border:1px solid var(--line);padding:8px 10px;border-radius:9px;font-size:12px;color:#dbe4ef;display:flex;justify-content:space-between;gap:6px}
-.book .bar{font-size:10px;color:var(--muted)}
-.notice{border-left:3px solid var(--gold);padding:10px 13px;background:#2b271e;color:#e9dfc9;border-radius:0 10px 10px 0;font-size:13px;margin:18px 0}
-.progress-panel{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0}
-.stat-box{background:#0e1a2b;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
-.stat-box .num{font-size:22px;font-weight:850;color:var(--gold)}.stat-box .lbl{font-size:11px;color:var(--muted);margin-top:2px}
-.chart{display:flex;gap:4px;height:60px;align-items:flex-end;margin-top:10px;padding-bottom:20px}
-.chart-bar{flex:1;background:#2a3a51;border-radius:4px 4px 0 0;position:relative;min-height:4px}
-.chart-bar .inner{position:absolute;bottom:0;left:0;right:0;background:var(--green);border-radius:4px 4px 0 0}
-.chart-bar .lbl{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-footer{text-align:center;color:#8190a4;font-size:12px;margin-top:22px}
-.history-item{background:#0e1a2b;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;display:flex;justify-content:space-between;align-items:center}
-.history-item .date{color:var(--muted);font-size:11px}
-.badge{display:inline-block;background:#1c2d44;color:var(--blue);border:1px solid #3c5a80;border-radius:6px;padding:2px 7px;font-size:11px;margin-left:4px}
-.cat-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
-.cat-btn{background:#1a2a40;border:1.5px solid #31445d;color:var(--text);border-radius:10px;padding:8px 13px;font-size:13px;cursor:pointer;transition:.15s;font-weight:600;min-height:38px;display:flex;align-items:center;gap:6px}
-.cat-btn:hover{border-color:var(--gold)}
-.cat-btn.partial{border-color:var(--gold);color:var(--gold);background:#2a2a1a}
-.cat-btn.selected{background:var(--gold);color:#172033;border-color:var(--gold)}
-.cat-btn .cnt{font-size:11px;opacity:.7;font-weight:500}
-.book-filter{display:flex;flex-wrap:wrap;gap:6px;max-height:200px;overflow-y:auto;padding:8px;background:#0d1828;border:1px solid var(--line);border-radius:12px;-webkit-overflow-scrolling:touch}
-.book-chip{background:#1a2a40;border:1px solid #31445d;color:var(--text);border-radius:999px;padding:8px 14px;font-size:13px;cursor:pointer;transition:.15s;font-weight:500;min-height:38px}
-.book-chip:hover{border-color:var(--gold)}
-.book-chip.selected{background:var(--gold);color:#172033;border-color:var(--gold);font-weight:800}
-.mini-btn{background:#243750;color:var(--text);border:1px solid #40536c;border-radius:8px;padding:8px 14px;font-size:13px;cursor:pointer;margin-right:6px;margin-top:6px;min-height:38px}
-.mini-btn:hover{border-color:var(--gold)}
-.filter-hint{font-size:12px;color:var(--muted);margin-top:6px}
-.filter-hint strong{color:var(--gold)}
-.match-wrap{margin-top:8px}
-.match-columns{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.match-col{display:flex;flex-direction:column;gap:7px}
-.match-col-header{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin-bottom:2px;font-weight:700}
-.match-item{background:#0e1a2b;border:1px solid #31445d;color:var(--text);border-radius:10px;padding:12px 14px;text-align:left;cursor:pointer;transition:.15s;font-size:14px;line-height:1.35;font-family:inherit;min-height:48px;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation}
-.match-item:hover:not(.matched){border-color:var(--gold);background:#142238}
-.match-item.selected{border-color:var(--gold);background:#2a3a51;box-shadow:0 0 0 2px #e6bd7044}
-.match-item.matched{border-color:var(--green);background:#12372e;color:#bfe9d4;cursor:default;opacity:.85}
-.match-item.wrong-flash{border-color:var(--red);background:#3c2028;animation:shakeFlash .45s}
-@keyframes shakeFlash{0%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}100%{transform:translateX(0)}}
-.match-progress{margin-top:14px;height:6px;background:#29384d;border-radius:10px;overflow:hidden}
-.match-progress-fill{height:100%;background:var(--green);width:0;transition:width .3s}
-.match-status{margin-top:6px;font-size:12px;color:var(--muted);text-align:center}
-.match-hint{font-size:12px;color:var(--muted);margin-top:10px;text-align:center;font-style:italic}
-.match-selection-bar{display:none;background:#2a3a51;border:1px solid var(--gold);border-radius:10px;padding:10px 12px;margin-bottom:10px;font-size:13px;color:var(--gold);line-height:1.35}
-.match-selection-bar.active{display:block}
-.match-selection-bar strong{color:var(--text);display:block;margin-top:2px}
-.subject-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:24px 0}
-.subject-card{background:#0e1a2b;border:2px solid #31445d;color:var(--text);border-radius:18px;padding:22px 18px;text-align:left;cursor:pointer;transition:.2s;min-height:180px;display:flex;flex-direction:column;gap:10px;font-family:inherit}
-.subject-card:hover{border-color:var(--gold);transform:translateY(-2px);background:#142238}
-.subject-card:active{transform:scale(.99)}
-.subject-icon{font-size:38px;line-height:1}
-.subject-name{font-size:20px;font-weight:800;line-height:1.2}
-.subject-desc{font-size:13px;color:var(--muted);flex:1}
-.subject-stats{font-size:11px;color:var(--gold);padding-top:8px;border-top:1px solid var(--line)}
-@media (max-width:640px){
-  body{padding-bottom:120px}
-  .wrap{padding:14px 12px 30px}
-  header{margin-bottom:14px;gap:8px}
-  header .pill{font-size:10px;padding:5px 9px}
-  h1{font-size:26px;margin:6px 0}
-  .sub{font-size:14px}
-  .card{padding:16px 14px;border-radius:16px}
-  .notice{font-size:12.5px;padding:9px 11px;margin:12px 0}
-  .setup-grid{grid-template-columns:1fr;gap:12px;margin:16px 0}
-  .startrow{flex-direction:column;align-items:stretch}
-  .startrow .primary{width:100%;min-height:52px;font-size:16px}
-  .startrow .small{text-align:center}
-  .booklist{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-  .book{font-size:11px;padding:7px 8px}
-  .progress-panel{grid-template-columns:repeat(2,1fr);gap:8px}
-  .stat-box{padding:10px}
-  .stat-box .num{font-size:20px}
-  .stat-box .lbl{font-size:10px}
-  .chart{height:70px}
-  .history-item{padding:9px 10px;font-size:12px}
-  .controls{position:fixed;bottom:0;left:0;right:0;background:#121e30;border-top:1px solid var(--line);padding:10px 12px;padding-bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:100;margin:0;gap:8px;box-shadow:0 -8px 24px #000a}
-  .controls .primary,.controls .secondary{flex:1;min-height:52px;font-size:15px;padding:12px 8px}
-  #game.card{padding:14px 12px 20px}
-  .stats{font-size:12px;margin-bottom:8px}
-  .track{margin-bottom:16px;height:6px}
-  .meta{gap:6px;margin-bottom:10px}
-  .tag{font-size:11px;padding:3px 8px}
-  .qnum{font-size:11px;margin-bottom:6px;letter-spacing:.05em}
-  .question{font-size:19px;line-height:1.3;margin-bottom:16px}
-  .answers{gap:9px}
-  .answer{padding:13px 12px;font-size:14.5px;min-height:56px;gap:10px}
-  .letter{flex:0 0 26px;height:26px;font-size:14px}
-  .feedback{padding:12px;font-size:14px;margin-top:12px}
-  .match-columns{grid-template-columns:1fr;gap:14px}
-  .match-col{gap:8px}
-  .match-col-header{font-size:10px;margin-top:4px}
-  .match-item{padding:12px 14px;font-size:14px;min-height:52px;line-height:1.4}
-  .match-selection-bar{position:sticky;top:0;z-index:10;background:#2a3a51;padding:10px 12px;margin:-4px 0 10px 0;box-shadow:0 4px 14px #0008;border-radius:10px}
-  .match-hint{font-size:11.5px;margin-top:12px}
-  .result .score{font-size:44px;margin:10px}
-  .result .startrow{flex-direction:column;gap:8px}
-  .result .startrow .primary,.result .startrow .secondary{width:100%}
-  #resetProgress{width:100%}
-  .book-filter{max-height:150px}
-  .book-chip{font-size:12px;padding:7px 11px}
-  .cat-btn{font-size:12px;padding:7px 11px}
-  .subject-grid{grid-template-columns:1fr;gap:12px;margin:18px 0}
-  .subject-card{padding:18px 16px;min-height:auto}
-  .subject-icon{font-size:32px}
-  .subject-name{font-size:17px}
-}
-</style></head><body><div class="wrap">
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#101b2b">
+  <title>Тренажёр НББС</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+<div class="wrap">
 
-<header><div class="brand" id="brandName">Тренажёр НББС</div><div id="headerRight"></div></header>
+  <header>
+    <div class="brand" id="brandName">Тренажёр НББС</div>
+    <div id="headerRight"></div>
+  </header>
 
-<section id="subjectSelect" class="card">
-  <div class="brand">Библейский тренажёр</div>
-  <h1>Тренажёр НББС</h1>
-  <p class="sub">Новосибирская библейская богословская семинария. Выбери предмет для тренировки памяти и понимания.</p>
-  <div class="subject-grid">
-    <button class="subject-card" data-subject="ot">
-      <div class="subject-icon">📖</div>
-      <div class="subject-name">Обзор Ветхого Завета</div>
-      <div class="subject-desc">39 книг: авторы, цели, темы, структуры, ключевые стихи, жанры, сопоставления.</div>
-      <div class="subject-stats" id="stats_ot">Загрузка…</div>
-    </button>
-    <button class="subject-card" data-subject="bs">
-      <div class="subject-icon">🔍</div>
-      <div class="subject-name">Основы изучения Библии</div>
-      <div class="subject-desc">10 глав: герменевтика, экзегетика, ошибки толкования, наблюдение, применение, книга Ионы.</div>
-      <div class="subject-stats" id="stats_bs">Загрузка…</div>
-    </button>
-  </div>
-</section>
-
-<section id="intro" class="card hidden">
-  <div class="brand" id="introBrand">Библейский тренажёр</div>
-  <h1 id="introTitle">Предмет</h1>
-  <p class="sub" id="introSub"></p>
-  <div class="notice" id="introNotice"></div>
-
-  <h3 style="margin:6px 0 4px">📊 Твой прогресс</h3>
-  <div class="progress-panel">
-    <div class="stat-box"><div class="num" id="pTotalAns">0</div><div class="lbl">Всего ответов</div></div>
-    <div class="stat-box"><div class="num" id="pTotalCor">0</div><div class="lbl">Правильных</div></div>
-    <div class="stat-box"><div class="num" id="pAcc">—</div><div class="lbl">Точность</div></div>
-    <div class="stat-box"><div class="num" id="pRounds">0</div><div class="lbl">Раундов</div></div>
-  </div>
-  <div id="progressDetail"></div>
-  <div id="historyList"></div>
-  <div class="startrow" style="margin-top:14px"><button class="secondary" id="resetProgress">Сбросить прогресс</button></div>
-
-  <div style="margin-top:26px">
-    <label style="font-size:15px;color:var(--text);font-weight:700" id="filterLabel">📚 Выбрать разделы</label>
-    <p class="filter-hint" id="filterHint">Не выбрано — вопросы из всего предмета. Выбрано — только из них. <strong id="selectedCount">выбрано: 0 (всё)</strong></p>
-    <div class="cat-buttons" id="catButtons"></div>
-    <div class="book-filter" id="bookFilter"></div>
-    <div>
-      <button type="button" class="mini-btn" id="selectAllBooks">Выбрать все</button>
-      <button type="button" class="mini-btn" id="clearBooks">Сбросить (всё)</button>
+  <!-- ЭКРАН ВЫБОРА ПРЕДМЕТА -->
+  <section id="subjectSelect" class="card">
+    <div class="brand">Библейский тренажёр</div>
+    <h1>Тренажёр НББС</h1>
+    <p class="sub">Новосибирская библейская богословская семинария. Выбери предмет для тренировки памяти и понимания.</p>
+    <div class="subject-grid">
+      <button class="subject-card" data-subject="ot">
+        <div class="subject-icon">📖</div>
+        <div class="subject-name">Обзор Ветхого Завета</div>
+        <div class="subject-desc">39 книг: авторы, цели, темы, структуры, ключевые стихи, жанры, сопоставления.</div>
+        <div class="subject-stats" id="stats_ot">Загрузка…</div>
+      </button>
+      <button class="subject-card" data-subject="bs">
+        <div class="subject-icon">🔍</div>
+        <div class="subject-name">Основы изучения Библии</div>
+        <div class="subject-desc">10 глав: герменевтика, экзегетика, ошибки толкования, наблюдение, применение, книга Ионы.</div>
+        <div class="subject-stats" id="stats_bs">Загрузка…</div>
+      </button>
     </div>
-  </div>
+  </section>
 
-  <div class="setup-grid" style="margin-top:22px">
-    <div><label for="mode">Режим</label><select id="mode"></select></div>
-    <div><label for="count">Количество вопросов</label><select id="count">
-      <option value="10">10 вопросов</option>
-      <option value="20" selected>20 вопросов</option>
-      <option value="all">Все доступные</option>
-    </select></div>
-    <div><label for="order">Порядок</label><select id="order">
-      <option value="random">Случайный</option>
-      <option value="sequence">По порядку</option>
-    </select></div>
-    <div style="display:flex;align-items:flex-end">
-      <button class="primary" id="start" style="width:100%">Начать игру →</button>
+  <!-- ИНТРО ПРЕДМЕТА -->
+  <section id="intro" class="card hidden">
+    <div class="brand" id="introBrand">Библейский тренажёр</div>
+    <h1 id="introTitle">Предмет</h1>
+    <p class="sub" id="introSub"></p>
+    <div class="notice" id="introNotice"></div>
+
+    <h3 style="margin:6px 0 4px">📊 Твой прогресс</h3>
+    <div class="progress-panel">
+      <div class="stat-box"><div class="num" id="pTotalAns">0</div><div class="lbl">Всего ответов</div></div>
+      <div class="stat-box"><div class="num" id="pTotalCor">0</div><div class="lbl">Правильных</div></div>
+      <div class="stat-box"><div class="num" id="pAcc">—</div><div class="lbl">Точность</div></div>
+      <div class="stat-box"><div class="num" id="pRounds">0</div><div class="lbl">Раундов</div></div>
     </div>
-  </div>
-  <div class="startrow" style="margin-top:8px"><span class="small" id="totalLabel"></span></div>
+    <div id="progressDetail"></div>
+    <div id="historyList"></div>
+    <div class="startrow" style="margin-top:14px"><button class="secondary" id="resetProgress">Сбросить прогресс</button></div>
 
-  <h3 style="margin:28px 0 4px" id="listTitle">Все разделы</h3>
-  <p class="small" id="listSub">Прогресс по разделу показан справа.</p>
-  <div class="booklist" id="booklist"></div>
-
-  <div class="startrow" style="margin-top:22px"><button class="secondary" id="backToSubject">← Сменить предмет</button></div>
-</section>
-
-<section id="game" class="card hidden">
-  <div class="stats"><span id="progressText"></span><span id="scoreText"></span></div>
-  <div class="track"><div class="fill" id="fill"></div></div>
-  <div class="meta"><span class="tag" id="bookTag"></span><span class="tag blue" id="categoryTag"></span></div>
-  <div class="qnum" id="qnum"></div>
-  <h2 class="question" id="question"></h2>
-  <div class="answers" id="answers"></div>
-  <div id="feedback" class="feedback hidden" aria-live="polite"></div>
-  <div class="controls"><button class="secondary" id="quit">Завершить</button><button class="primary" id="next" disabled>Следующий →</button></div>
-</section>
-
-<section id="result" class="card result hidden">
-  <div class="brand">Раунд завершён</div>
-  <h1>Результат</h1>
-  <div class="score" id="finalScore">0%</div>
-  <p id="resultText" class="sub" style="margin:0 auto 18px"></p>
-  <div class="startrow" style="justify-content:center"><button class="primary" id="again">Сыграть ещё раз</button><button class="secondary" id="home">К настройкам</button></div>
-  <div id="missed" style="text-align:left;margin-top:22px"></div>
-</section>
-
-<footer>Работает офлайн · Прогресс хранится только на этом устройстве</footer></div>
-
-<script>
-"use strict";
-
-/* ============================================================
-   ПРЕДМЕТЫ
-   ============================================================ */
-const SUBJECTS = {
-  ot: { name: "Обзор Ветхого Завета",
-        sub: "Проверь, насколько хорошо ты запомнил авторов, цели, главные темы, структуры и особенности книг. Неверные ответы подобраны максимально близко к правде — чтобы приходилось действительно думать.",
-        notice: "Источник — презентация «Обзор Ветхого Завета» и «Тестики на пятёрочку». Фильтр книг работает во всех режимах.",
-        filterLabel: "📚 Выбрать книги (работает во всех режимах)",
-        filterHint: "Не выбрано — вопросы из всех книг. Выбрано — только из них.",
-        listTitle: "Все 39 книг Ветхого Завета",
-        listSub: "Список охватывает протестантский канон. Прогресс по книге показан справа." },
-  bs: { name: "Основы изучения Библии",
-        sub: "Герменевтика, экзегетика, принципы толкования, ошибки, наблюдение, применение. Вопросы и сопоставления по всем 10 главам конспекта НББС.",
-        notice: "Источник — конспект курса «Основы изучения Библии» (НББС, преподаватель С.Г. Кузнецов). Фильтр по главам работает во всех режимах.",
-        filterLabel: "📖 Выбрать главы (работает во всех режимах)",
-        filterHint: "Не выбрано — вопросы из всех глав. Выбрано — только из них.",
-        listTitle: "Все 10 глав курса",
-        listSub: "Прогресс по каждой главе показан справа." }
-};
-
-const MODES_OT = [
-  {v:"all", l:"Все темы вперемешку"},
-  {v:"match", l:"🔗 Сопоставление (только этот тип)"},
-  {v:"author", l:"Автор и дата"},
-  {v:"goal", l:"Цели книг"},
-  {v:"theme", l:"Главные темы"},
-  {v:"structure", l:"Структура и жанр"},
-  {v:"hard", l:"🔥 Сложные (только дистракторы)"},
-  {v:"mixed", l:"Экзамен — 20 вопросов"}
-];
-const MODES_BS = [
-  {v:"all", l:"Все темы вперемешку"},
-  {v:"match", l:"🔗 Сопоставление (только этот тип)"},
-  {v:"definition", l:"Определения"},
-  {v:"example", l:"Примеры и иллюстрации"},
-  {v:"theme", l:"Темы и содержание"},
-  {v:"keyverse", l:"Ключевые стихи"},
-  {v:"hard", l:"🔥 Сложные"},
-  {v:"mixed", l:"Экзамен — 20 вопросов"}
-];
-
-/* ============================================================
-   ВОПРОСЫ ОВЗ
-   ============================================================ */
-const QUESTIONS_OT = [
-{book:"Введение",category:"Введение",q:"Какие две основные причины пренебрежения Ветхим Заветом названы в курсе?",a:["Исторические причины и сложность Ветхого Завета","Богословское несоответствие Новому Завету и отсутствие святоотеческих толкований","Отсутствие современных переводов и гонения на церковь в XX веке","Влияние языческих культур и политические запреты на чтение"],correct:0,why:"Слайд прямо называет две причины: исторические причины пренебрежения и сложность Ветхого Завета."},
-{book:"Введение",category:"Введение",q:"Какой процент всей Библии составляет Ветхий Завет?",a:["Около 74% (¾ всей Библии)","Около 60%","Около 80%","Около 90%"],correct:0,why:"В презентации: Ветхий Завет составляет ¾ всей Библии, около 74%."},
-{book:"Введение",category:"Канон",q:"Какой собор, по популярному заблуждению, определил границы ветхозаветного канона?",a:["Ямнийский собор 90 г. по Р.Х.","Никейский собор 325 г.","Лаодикийский собор 363 г.","Карфагенский собор 397 г."],correct:0,why:"Кайзер опровергает тезис о том, что Ямнийский собор (90 г.) определил канон."},
-{book:"Пятикнижие",category:"Введение",q:"От какого греческого слова происходит термин «Пятикнижие»?",a:["Пентатеухос (πεντάτευχος) — «пять свитков/частей»","Гексапла (ἑξαπλᾶ) — «шестикратное издание»","Тетраграмматон — «четырёхбуквенное имя»","Полиглотта — «многоязычная книга»"],correct:0,why:"Термин пришёл из греч. πεντάτευχος — «книга из пяти частей»."},
-{book:"Пятикнижие",category:"Тема",q:"Какие три из пяти центральных тем Пятикнижия названы в презентации?",a:["Бог как учредитель народа, Бог действующий в истории, план спасения","Святость как характер Бога, завет как форма отношений, закон как руководство","Творение как основание, патриархи как начало, исход как кульминация","Бог как Творец, Израиль как избранный народ, земля как наследие"],correct:0,why:"Слайд перечисляет: 1) Бог — учредитель народа; 2) Бог действует в истории; 3) План спасения; 4) Спасение — действие Бога; 5) Святость — характер Бога."},
-{book:"Пятикнижие",category:"Структура",q:"Какой документ лежит в основе структуры Второзакония?",a:["Форма договора сюзерена (вассала) — хеттские договоры II тыс. до н.э.","Ассирийские договоры I тыс. до н.э. — с проклятиями и благословениями","Египетские храмовые надписи — с перечислением даров","Вавилонский кодекс Хаммурапи — с казуистическими законами"],correct:0,why:"Структура Второзакония больше соответствует хеттским договорам II тыс. до н.э."},
-{book:"Бытие",category:"Цель",q:"Какую первостепенную цель книги Бытие выделяет А. Прокопенко?",a:["Показать историю взаимоотношений Яхве с Израилем, обосновывающую Его единоличную власть","Показать происхождение мира и человека как основание для богословия творения","Объяснить происхождение народов и их расселение после потопа","Дать патриархальный образец веры для последующих поколений"],correct:0,why:"Слайд о цели Бытия называет книгу исторической преамбулой к завету Бога с Израилем."},
-{book:"Бытие",category:"Структура",q:"Какие две большие части выделены в структуре Бытия?",a:["Первобытная история (1–11) и патриархальная история (12–50)","История творения (1–2) и история грехопадения (3–11)","История Ноя (6–9) и история Авраама (12–25)","История Иакова (27–36) и история Иосифа (37–50)"],correct:0,why:"Четыре события в главах 1–11 и четыре патриарха в главах 12–50."},
-{book:"Бытие",category:"Структура",q:"Какие четыре патриарха выделены в Бытии 12–50?",a:["Авраам (12–24), Исаак (25–26), Иаков (27–36), Иосиф (37–50)","Авраам (12–25), Исаак (26–27), Иаков (28–36), Иосиф (37–50)","Авраам (12–23), Исаак (24–26), Иаков (27–35), Иосиф (36–50)","Авраам (12–25), Исаак (26–28), Иаков (29–36), Иосиф (37–50)"],correct:0,why:"В презентации: Авраам, Исаак, Иаков, Иосиф."},
-{book:"Исход",category:"Тема",q:"Какие два основных события описывает книга Исход?",a:["Выход Израиля из Египта и установление союза с Богом","Строительство скинии и установление системы жертвоприношений","Призвание Моисея и десять казней египетских","Дарование закона на Синае и поклонение золотому тельцу"],correct:0,why:"Спасение из Египта и вновь установленный союз Израиля с Богом."},
-{book:"Исход",category:"Автор",q:"Кому презентация приписывает авторство Исхода?",a:["Моисею","Моисею и Аарону как соавторам","Моисею с редакцией Иисуса Навина","Моисею с редакцией Ездры"],correct:0,why:"На слайде: автор — Моисей."},
-{book:"Исход",category:"Структура",q:"Какова структура книги Исход?",a:["Выход из Египта/избавление (1–18), заключение завета (19–24), строительство скинии (25–40)","Притеснение (1–11), казни (12–15), странствие (16–18), завет (19–40)","Избавление (1–15), завет (16–24), скиния (25–40)","Призвание Моисея (1–6), казни (7–12), исход (13–18), закон (19–40)"],correct:0,why:"Исход: избавление (1–18), закон/завет (19–24), скиния (25–40)."},
-{book:"Левит",category:"Тема",q:"Как сформулирована центральная задача книги Левит?",a:["Научить, как поклоняться Богу, живущему среди народа, и как свято жить перед Ним","Установить систему жертвоприношений, священства и законов чистоты","Объяснить, как Израиль должен отличаться от окружающих народов","Показать, как Божье присутствие в скинии освящает весь народ"],correct:0,why:"Слайды подчёркивают Божье присутствие, поклонение и святую жизнь."},
-{book:"Левит",category:"Структура",q:"Какова структура книги Левит?",a:["Путь к Богу — жертва (1–17); ежедневная жизнь с Богом — освящение (18–27)","Жертвы (1–7); священство (8–10); чистота (11–15); День искупления (16–17); святость (18–27)","Законы о жертвах (1–10); законы о чистоте (11–15); законы о святости (16–27)","Скиния (1–10); чистота (11–17); освящение (18–27)"],correct:0,why:"Левит: I. Путь к Богу — жертва (1–17). II. Ежедневная жизнь — освящение (18–27)."},
-{book:"Числа",category:"Тема",q:"Почему поколение исхода не вошло в Землю Обетованную?",a:["Из-за неверия и непослушания Богу","Из-за отказа Моисея вести народ после разведки","Из-за поражения от амаликитян и хананеев","Из-за ропота и бунта Корея, Дафана и Авирона"],correct:0,why:"Презентация связывает гибель поколения в пустыне с неверностью и непослушанием."},
-{book:"Числа",category:"Структура",q:"Какова структура книги Числа (по простому плану)?",a:["Первое поколение погибает в пустыне (1–25); второе поколение готовится войти в Землю (26–36)","Перепись (1–4); законы (5–10); путь от Синая (11–14); странствие (15–25); новое поколение (26–36)","Синай (1–10); пустыня (11–19); равнины Моава (20–36)","Порядок (1–10); беспорядок (11–25); восстановление порядка (26–36)"],correct:0,why:"Простой план: I. Первое поколение погибает в пустыне (1–25). II. Второе готовится войти (26–36)."},
-{book:"Второзаконие",category:"Цель",q:"Какова одна из основных целей Второзакония?",a:["Актуализировать закон и завет для нового поколения перед входом в землю","Дать свод законов для жизни в земле обетованной после завоевания","Обновить завет с новым поколением после сорока лет странствия","Подготовить народ к переходу через Иордан под руководством Иисуса Навина"],correct:0,why:"На слайде цели: актуализация закона и призыв верно следовать завету."},
-{book:"Второзаконие",category:"Структура",q:"Какова структура Второзакония (по Прокопенко)?",a:["1-я проповедь (прошлое, 1–4); 2-я проповедь (настоящее, 5–26); 3-я проповедь (будущее, 27–30); историческое дополнение (31–34)","Проповедь о прошлом (1–4); проповедь о законе (5–11); свод законов (12–26); благословения и проклятия (27–30); дополнение (31–34)","Введение (1–4); закон (5–26); завет (27–30); песнь Моисея (31–34)","Исторический пролог (1–4); условия завета (5–26); благословения (27–28); обновление (29–30); дополнение (31–34)"],correct:0,why:"Прокопенко: 1) Первая проповедь (1–4); 2) Вторая (5–26); 3) Третья (27–30); 4) Дополнение (31–34)."},
-{book:"Иисус Навин",category:"Тема",q:"Какой основной этап истории Израиля описывает книга Иисуса Навина?",a:["Вхождение в землю и её завоевание/разделение","Завоевание земли и установление системы судей","Переход через Иордан и обновление завета в Сихеме","Распределение земли между коленами и служение в скинии"],correct:0,why:"Разделы книги посвящены завоеванию земли и её распределению."},
-{book:"Судьи",category:"Тема",q:"Какая повторяющаяся характеристика эпохи Судей подчёркивается в презентации?",a:["Каждый делал то, что ему казалось справедливым","Народ постоянно впадал в идолопоклонство и был наказываем","Судьи были временными лидерами, поставленными Богом","Израиль не смог полностью изгнать хананеев из земли"],correct:0,why:"Формула из Суд. 21:25 используется при описании исторического фона."},
-{book:"Судьи",category:"Тема",q:"Сколько примерно лет длился период Судей?",a:["Около 390 лет","Около 300 лет","Около 450 лет","Около 500 лет"],correct:0,why:"Правление судей около 390 лет."},
-{book:"Судьи",category:"Тема",q:"Какой цикл повторяется в книге Судей?",a:["Грех → угнетение → вопль → избавление → новый грех","Отступничество → наказание → покаяние → мир → новое отступничество","Идолопоклонство → плен → возвращение → реформа → новое идолопоклонство","Неверность → суд → плач → прощение → восстановление завета"],correct:0,why:"Цикл: израильтяне грешили → Бог наказывал → взывали → Бог посылал судей."},
-{book:"Руфь",category:"Тема",q:"Какое еврейское понятие названо ключевым для книги Руфь?",a:["Хэсэд — заветная, жертвенная любовь и верность","Геула — родственное искупление и выкуп","Эмуна — вера и верность Богу","Шалом — мир и целостность отношений"],correct:0,why:"Хэсэд встречается трижды и является ключевым."},
-{book:"1–2 Царств",category:"Тема",q:"Какой исторический переход связан с книгами Царств?",a:["Переход от судей к монархии: Саул, Давид и становление царской власти","Переход от теократии к монархии и упадок судейского правления","Переход от скинии к храму и централизация богослужения","Переход от эпохи завоевания к эпохе судей и пророков"],correct:0,why:"Материал о ранней монархии связан с падением Саула и возвышением Давида."},
-{book:"1–2 Царств",category:"Тема",q:"Какой временной промежуток охватывают книги 1–2 Царств?",a:["1043–586 гг. до н.э.","1050–931 гг. до н.э.","1043–722 гг. до н.э.","1020–586 гг. до н.э."],correct:0,why:"Монархия 1043–586 гг. до н.э."},
-{book:"3–4 Царств",category:"Тема",q:"Что такое «богословие воздаяния» в книгах Царств?",a:["Послушание Божьим заповедям приносит благословение, а непослушание — неудачу","Бог воздаёт каждому по его социальному статусу и положению в обществе","Бог воздаёт только в загробной жизни, а земная жизнь не связана с послушанием","Воздаяние относится только к языческим народам, а не к Израилю"],correct:0,why:"Автор оценивает каждого царя по верности: послушание → благословение, непослушание → неудача."},
-{book:"3–4 Царств",category:"История",q:"Назовите два катастрофических события для государственности Израиля.",a:["Падение Самарии (722 г. до н.э.) и падение Иерусалима (586 г. до н.э.)","Падение Ниневии (612) и битва при Кархемише (605)","Разрушение Силома (1050) и падение Самарии (722)","Битва при Мегиддо (609) и падение Иерусалима (586)"],correct:0,why:"Северное царство — Самария 722, Южное — Иерусалим 586."},
-{book:"Ездра",category:"Цель",q:"Какой центральный акцент связан с книгой Ездры?",a:["Возвращение из плена и восстановление общины, включая храм и жизнь по Закону","Возвращение из плена и восстановление стен Иерусалима","Восстановление храма и реформы священства при Зоровавеле","Возрождение народа через публичное чтение закона Ездрой"],correct:0,why:"Раздел Ездры и Неемии посвящён возвращению и восстановлению."},
-{book:"Ездра",category:"История",q:"В каком году был указ Кира, разрешивший возвращение иудеев?",a:["538 г. до н.э.","586 г. до н.э.","516 г. до н.э.","445 г. до н.э."],correct:0,why:"Указ Кира — около 538 г. до н.э."},
-{book:"Неемия",category:"Тема",q:"Какое дело связано с Неемией?",a:["Восстановление стен Иерусалима и упорядочение жизни общины","Восстановление храма и реформы священства","Возрождение народа через публичное чтение закона","Организация возвращения из Вавилона и перепись народа"],correct:0,why:"Центрально — восстановление Иерусалима."},
-{book:"Есфирь",category:"Тема",q:"Какой необычной особенностью книги Есфирь задаётся вопрос?",a:["В книге не упоминается имя Бога","В ней нет ни одного женского персонажа","Она написана стихами целиком","В ней описан исход из Египта"],correct:0,why:"Вопрос о причинах отсутствия имени Бога включён в итоговый тест."},
-{book:"Есфирь",category:"Цель",q:"Какой исторический праздник связан с книгой Есфирь?",a:["Пурим","Пасха","Пятидесятница","Праздник Кущей"],correct:0,why:"Чтение Есфири на праздник Пурим."},
-{book:"Иов",category:"Тема",q:"Какой основной вопрос рассматривает книга Иов?",a:["Страдание праведника и вопрос о Божьей справедливости (теодицея)","Проблема воздаяния и благословения праведников в земной жизни","Вопрос о природе зла и его месте в Божьем творении","Проблема невинных страданий и молчания Бога в кризисные моменты"],correct:0,why:"Иов рассматривает проблему страдания и связанные богословские вопросы."},
-{book:"Псалтирь",category:"Автор",q:"Кто назван главным автором Псалтири?",a:["Давид — 73 из 150 псалмов","Давид — 60 из 150 псалмов","Давид — 80 из 150 псалмов","Давид — 50 из 150 псалмов"],correct:0,why:"Давид — 73 псалма; Асаф — 12, сыны Кореевы — 10, Соломон — 2, Моисей — 1, анонимные — 48."},
-{book:"Псалтирь",category:"Структура",q:"На сколько книг делится Псалтирь и почему?",a:["На пять книг — по аналогии с Пятикнижием","На три книги — по числу главных авторов","На четыре книги — по числу этапов собирания","На две книги — до плена и после плена"],correct:0,why:"Пять книг: 1–40, 41–71, 72–88, 89–105, 106–150."},
-{book:"Псалтирь",category:"Жанр",q:"Какой жанр псалмов самый распространённый (более 60)?",a:["Плач/мольба","Хвала","Благодарение","Царские"],correct:0,why:"Плач/мольба — самый распространённый тип."},
-{book:"Притчи",category:"Жанр",q:"Какую ошибку часто совершают в отношении книги Притчей?",a:["Считают притчи безусловными обещаниями или повелениями, а не общими принципами","Считают их только поэзией без практического смысла","Приписывают их Моисею как часть Пятикнижия","Читают их только на греческом, игнорируя еврейский текст"],correct:0,why:"Притчи — не обещания и не повеления, а общие жизненные принципы."},
-{book:"Песнь песней",category:"Тема",q:"Кто названы главными действующими лицами Песни песней?",a:["Возлюбленная Суламита и возлюбленный Соломон","Суламита и пастух, за которого она выходит замуж","Соломон и дочь фараона, его первая жена","Соломон и царица Савская, пришедшая испытать его"],correct:0,why:"Действующие лица — Суламита и Соломон."},
-{book:"Екклесиаст",category:"Цель",q:"К какому итоговому выводу призывает Екклесиаст в ключевом тексте?",a:["Бояться Бога и соблюдать Его заповеди","Искать мудрость и наслаждаться жизнью как даром Божьим","Помнить о смерти и готовиться к суду Божьему","Отказаться от земных удовольствий ради вечности"],correct:0,why:"Еккл. 12:13–14: бойся Бога и заповеди Его соблюдай."},
-{book:"Исаия",category:"Тема",q:"Какой крупный тематический акцент характерен для книги Исаии?",a:["Святость Бога, суд и надежда спасения","Остаток, всевластие Бога и грядущий Мессия","Суд над народами, утешение Израиля и Новый Иерусалим","Обличение формальной религии, социальной несправедливости и призыв к покаянию"],correct:0,why:"Исаия: святость, суд, спасение."},
-{book:"Исаия",category:"Структура",q:"Какова структура книги Исаии?",a:["Божье наказание (1–39); Божье утешение (40–66)","Суд (1–35); исторический обзор (36–39); утешение (40–55); завершение (56–66)","Пророчества о Иудее и народах (1–39); утешение в плену (40–55); будущая слава (56–66)","Обличение (1–12); суд над народами (13–27); бедствия (28–35); Езекия (36–39); утешение (40–66)"],correct:0,why:"Исаия: I. Наказание (1–39); II. Утешение (40–66)."},
-{book:"Иеремия",category:"Тема",q:"Какая тема проходит через книгу Иеремии?",a:["Божий суд над Иудеей и обещание Нового завета","Суд над Иерусалимом и надежда на восстановление после плена","Обличение социальной несправедливости и призыв к покаянию","Страдания пророка и его конфликт с лжепророками"],correct:0,why:"Слайд связывает суд над Иудеей с обещанием Нового завета (Иер. 31)."},
-{book:"Плач Иеремии",category:"Тема",q:"Какой ключевой стих назван в Плаче Иеремии?",a:["Плач 3:22–23 — «Велика Твоя верность»","Плач 1:1 — «Как одиноко сидит город…»","Плач 5:21 — «Обрати нас к Себе, Господи…»","Плач 2:1 — «Как помрачил Господь во гневе Своём…»"],correct:0,why:"Плач 3:22–23 — краткая экспозиция всей книги."},
-{book:"Иезекииль",category:"Адресат",q:"К кому обращается Иезекииль?",a:["К изгнанникам в Вавилонии","К израильтянам в Египте","К жителям Ниневии","К поколению, готовившемуся войти в Ханаан"],correct:0,why:"Обращение к изгнанникам в Вавилонии."},
-{book:"Даниил",category:"Жанр",q:"В каком жанре написана книга Даниила?",a:["Апокалиптическая литература с элементами биографического повествования","Только историческая хроника","Только поэзия","Только юридический кодекс"],correct:0,why:"1–6 — биографическое повествование, 7–12 — пророчества."},
-{book:"Осия",category:"Тема",q:"Какую метафору использует книга Осии?",a:["Метафору брака","Метафору строительства города","Метафору морского путешествия","Метафору царского суда"],correct:0,why:"В целях книги прямо указана личная метафора брака."},
-{book:"Иоиль",category:"Тема",q:"Какая концепция названа главной темой книги Иоиля?",a:["День Господень","Завет с Давидом","Мудрость царя Соломона","Исход из Египта"],correct:0,why:"Центральная концепция — День Господень."},
-{book:"Амос",category:"Тема",q:"Какую проблему в Израиле выделяет презентация как ключевую тему Амоса?",a:["Социальную несправедливость","Недостаток военных колесниц","Отсутствие царской династии Давида","Строительство второго храма"],correct:0,why:"Слайд ключевых тем: «несправедливость в Израиле»."},
-{book:"Авдий",category:"Адресат",q:"Кто является основным адресатом книги Авдия?",a:["Едом","Египет","Вавилон","Ниневия"],correct:0,why:"Основной адресат — Едом."},
-{book:"Иона",category:"Тема",q:"Какая главная тема книги Ионы?",a:["Спасение язычников и Божья милость к ним","Суд над Едомом","Строительство храма","Падение Иерусалима"],correct:0,why:"Божья милость к Ниневии и спасение язычников."},
-{book:"Михей",category:"Цель",q:"Как Мих. 6:8 формулирует, чего Бог ожидает от человека?",a:["Действовать справедливо, любить милосердие и смиренно ходить перед Богом","Приносить больше животных в жертву","Строить укреплённые города","Искать союза с сильными империями"],correct:0,why:"Мих. 6:8 прямо сформулирован в презентации."},
-{book:"Наум",category:"Тема",q:"Какова главная тема книги Наума?",a:["Суд над Ассирией и Ниневией","Восстановление стен Иерусалима","Мудрость семейной жизни","Исход Израиля из Египта"],correct:0,why:"Суд над Ассирией/Ниневией — центральная тема."},
-{book:"Наум",category:"История",q:"В каком году, согласно презентации, пала Ниневия?",a:["В 612 году до н. э.","В 586 году до н. э.","В 515 году до н. э.","В 722 году до н. э."],correct:0,why:"Падение Ниневии — 612 г. до н.э."},
-{book:"Аввакум",category:"Ключевой стих",q:"Какая фраза названа ключевой для книги Аввакума?",a:["Праведный верою жив будет","Бойся Бога и заповеди Его соблюдай","Я Господь, целитель твой","Господь — Пастырь мой"],correct:0,why:"Авв. 2:4: «Праведный верою жив будет»."},
-{book:"Софония",category:"Тема",q:"Какая главная тема книги Софонии?",a:["Будущий всемирный суд — День Господень","Премудрость и семейная жизнь","Возвращение из Египта","Строительство стен Иерусалима"],correct:0,why:"День Господень и глобальный суд над народами."},
-{book:"Аггей",category:"Тема",q:"Какую практическую задачу ставит перед народом книга Аггея?",a:["Возобновить строительство храма и правильно расставить приоритеты","Построить ковчег","Завоевать Ниневию","Перенести столицу в Египет"],correct:0,why:"Призыв к сооружению храма и неправильные приоритеты."},
-{book:"Аггей",category:"Исторический фон",q:"В каком году Аггей начал пророчествовать?",a:["Около 520 года до н. э.","Около 1406 года до н. э.","Около 586 года до н. э.","Около 612 года до н. э."],correct:0,why:"520 г. до Р.Х."},
-{book:"Захария",category:"Цель",q:"Какова общая цель первых восьми глав Захарии?",a:["Уверить поколение, что Бог исполнит прежние обетования и восстановит утраченное","Объяснить исход из Египта","Осудить царствование Соломона","Описать страдания Иова"],correct:0,why:"Восемь видений — обещание восстановления после 586 г. до н.э."},
-{book:"Малахия",category:"Цель",q:"Какую главную задачу ставит книга Малахии?",a:["Вернуть народ к заветной верности и благоговейному поклонению Богу","Призвать к завоеванию Ханаана","Научить строительству скинии","Описать разделение царства"],correct:0,why:"Цели: любовь, верность завету, восстановление поклонения."}
-];
-
-const MATCH_OT = [
-{type:"match",books:["Бытие","Исход","Левит","Числа","Второзаконие"],q:"Сопоставьте книги Пятикнижия с их главными идеями",leftLabel:"Книга",rightLabel:"Главная идея",
- pairs:[{left:"Бытие",right:"Происхождение мира и народа Божьего"},{left:"Исход",right:"Спасение из рабства и заключение завета"},{left:"Левит",right:"Святость и правильное поклонение"},{left:"Числа",right:"Странствие в пустыне и неверие поколения"},{left:"Второзаконие",right:"Обновление завета перед входом в землю"}],why:"Бытие — происхождение; Исход — спасение и завет; Левит — святость; Числа — странствие; Второзаконие — обновление завета."},
-{type:"match",books:["Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","Ездра","Неемия"],q:"Сопоставьте исторические книги с их ключевыми персонажами",leftLabel:"Книга",rightLabel:"Ключевые лица",
- pairs:[{left:"Иисус Навин",right:"Иисус Навин и Раав"},{left:"Судьи",right:"Гедеон, Девора, Самсон"},{left:"Руфь",right:"Руфь и Вооз"},{left:"1–2 Царств",right:"Саул, Давид, Самуил"},{left:"3–4 Царств",right:"Соломон, Илия, Елисей"},{left:"Ездра–Неемия",right:"Зоровавель, Ездра, Неемия"}],why:"Исторические книги с ключевыми лицами."},
-{type:"match",books:["Осия","Иоиль","Амос","Авдий","Иона","Михей"],q:"Сопоставьте малых пророков с их главными темами",leftLabel:"Пророк",rightLabel:"Главная тема",
- pairs:[{left:"Осия",right:"Неверность Израиля и верная любовь Бога"},{left:"Иоиль",right:"День Господень и излияние Духа"},{left:"Амос",right:"Социальная несправедливость и суд"},{left:"Авдий",right:"Суд над Едомом за предательство"},{left:"Иона",right:"Милость Божья к язычникам"},{left:"Михей",right:"Справедливость, милосердие и смиренномудрие"}],why:"Малые пророки и темы."},
-{type:"match",books:["Авдий","Иона","Михей","Софония","Аггей","Захария","Малахия"],q:"Сопоставьте имена пророков с их значениями",leftLabel:"Имя пророка",rightLabel:"Значение имени",
- pairs:[{left:"Авдий",right:"«Раб Яхве»"},{left:"Иона",right:"«Голубь»"},{left:"Михей",right:"«Кто как Яхве?»"},{left:"Софония",right:"«Яхве сокрыл/сохранил»"},{left:"Аггей",right:"От слова «хаг» — «праздник»"},{left:"Захария",right:"«Яхве вспомнил»"},{left:"Малахия",right:"«Мой вестник»"}],why:"Значения имён прямо указаны на слайдах."},
-{type:"match",books:["4 Царств","Иеремия","Ездра","Неемия","Аггей","Наум","Софония"],q:"Сопоставьте события с их датами",leftLabel:"Событие",rightLabel:"Дата",
- pairs:[{left:"Падение Самарии",right:"722 г. до н.э."},{left:"Падение Иерусалима",right:"586 г. до н.э."},{left:"Указ Кира о возвращении",right:"538 г. до н.э."},{left:"Завершение второго храма",right:"516 г. до н.э."},{left:"Возвращение Ездры",right:"458 г. до н.э."},{left:"Прибытие Неемии",right:"445 г. до н.э."},{left:"Падение Ниневии",right:"612 г. до н.э."}],why:"Ключевые даты ветхозаветной истории."},
-{type:"match",books:["Псалтирь","Притчи","Иов","Песнь песней","Екклесиаст","Плач Иеремии","Даниил"],q:"Сопоставьте книги с их жанрами",leftLabel:"Книга",rightLabel:"Жанр",
- pairs:[{left:"Псалтирь",right:"Поэзия и молитвы"},{left:"Притчи",right:"Наставления мудрости"},{left:"Иов",right:"Судебная драма / литература премудрости"},{left:"Песнь песней",right:"Любовная поэзия"},{left:"Екклесиаст",right:"Философская литература мудрости"},{left:"Плач Иеремии",right:"Плач (кина)"},{left:"Даниил",right:"Апокалиптическая литература"}],why:"Книги и их жанры."}
-];
-
-/* ============================================================
-   ВОПРОСЫ ОСНОВЫ ИЗУЧЕНИЯ БИБЛИИ
-   ============================================================ */
-const QUESTIONS_BS = [
-{book:"Глава 1",category:"Тема",q:"Какие четыре мотива изучения Библии названы в курсе?",a:["Познавать истину, познавать Бога, возрастать в Боге, противостоять лжеучителям","Познавать истину, исполнять закон, соблюдать субботу, учить других","Познавать Бога, обрести здоровье, обрести богатство, помогать ближним","Понимать пророчества, крестить, причащаться, свидетельствовать"],correct:0,why:"Слайд 1.4: познавать истину, познавать Бога, возрастать в Боге, противостоять лжеучителям."},
-{book:"Глава 1",category:"Ключевой стих",q:"Какой стих приведён как ключевой для мотива «познавать истину»?",a:["Ин. 17:17 — «Слово Твоё есть истина»","Ин. 14:6 — «Я есмь путь и истина и жизнь»","Пс. 118:105 — «Слово Твоё — светильник ноге моей»","2 Тим. 3:16 — «Всё Писание богодухновенно»"],correct:0,why:"Ключевой стих мотива «познавать истину» — Ин. 17:17."},
-{book:"Глава 1",category:"Определение",q:"Что такое верность согласно курсу?",a:["Постоянство в исполнении принятого на себя дела","Отсутствие ошибок в учении и жизни","Готовность отказаться от себя ради ближнего","Способность переносить трудности без ропота"],correct:0,why:"Определение верности: постоянство в исполнении принятого на себя дела."},
-{book:"Глава 1",category:"Пример",q:"Кто приведён как библейский пример верности в доме Божьем?",a:["Моисей","Авраам","Иосиф","Давид"],correct:0,why:"Моисей верный во всём доме Божьем (Чис. 12:7; Евр. 3:2, 5)."},
-{book:"Глава 1",category:"Тема",q:"Что, по 2 Пет. 1:3–11, связано с познанием Бога?",a:["Освобождение от растления мира и возрастание в добродетели, рассудительности, воздержании, терпении, благочестии, братолюбии, любви","Получение дара исцеления и чудотворения","Обретение церковной должности и авторитета","Обретение финансового благополучия"],correct:0,why:"2 Пет. 1:3–11 связывает познание с освобождением от растления и возрастанием в добродетелях."},
-{book:"Глава 1",category:"Пример",q:"Что такое «Free Grace», против чего предостерегает курс?",a:["Учение, сводящее спасительную веру к интеллектуальному согласию без покаяния, исповедания, крещения, церковной жизни и нравственной перемены","Учение о спасении по делам закона","Правильное понимание благодати в посланиях Павла","Учение о всеобщем спасении"],correct:0,why:"Free Grace — лжеучение, против которого нужно защищать людей."},
-{book:"Глава 1",category:"Тема",q:"Какая цель у мотива «противостоять лжеучителям»?",a:["Защищать людей от искажения истины и самим не поддаваться убедительным рассуждениям","Проверять, кто прав в спорах о духовных дарах","Бороться с инакомыслящими через отлучение","Учить только избранных верующих"],correct:0,why:"Ответственность — защищать людей от искажения истины и самим не подменять её."},
-{book:"Глава 1",category:"Пример",q:"Что из перечисленного НЕ гарантирует верности действий?",a:["Искренность человека","Знание текста","Духовное возрождение","Молитва"],correct:0,why:"В рассказе Дона Карсона отец сгребал листья, а сын разбрасывал собранные кучи, считая себя помощником — искренность не гарантирует правильности."},
-{book:"Глава 2",category:"Определение",q:"Что такое графическая (письменная) богодухновенность?",a:["Действие, при котором часть особого откровения Бога была переведена в постоянную письменную форму через сверхъестественное участие Святого Духа — как идеи, так и конкретные слова","Действие, при котором автор записывал текст под диктовку без участия своего разума","Озарение человеческого разума для понимания истины","Усиление обычных способностей автора без особого руководства"],correct:0,why:"Определение Ходжеса: Дух руководил мыслями и словами, сохраняя особенности авторов."},
-{book:"Глава 2",category:"Тема",q:"На что распространяется богодухновенность?",a:["На мысли и конкретные слова оригинальных рукописей","Только на мысли авторов, слова выбирали сами","На все существующие переводы и копии","Только на вероучительные отрывки"],correct:0,why:"Богодухновенность относится и к мыслям, и к конкретным словам оригинала."},
-{book:"Глава 2",category:"Тема",q:"Какая теория богодухновенности правильная?",a:["Вербальная","Динамическая","Теория просветления","Теория интуиции"],correct:0,why:"Принимаем вербальную теорию: руководство Духа распространяется и на слова."},
-{book:"Глава 2",category:"Тема",q:"Какие пять свойств Писания разобраны в курсе?",a:["Богодухновенность, каноничность, непогрешимость, авторитетность, ясность","Богодухновенность, безошибочность, святость, единство, простота","Авторитетность, святость, каноничность, единство, достаточность","Богодухновенность, каноничность, единство, достаточность, красота"],correct:0,why:"Пять свойств: богодухновенность, каноничность, непогрешимость, авторитетность, ясность."},
-{book:"Глава 2",category:"Определение",q:"Что такое каноничность?",a:["Истинные границы Божьего особого откровения, включающие 66 книг, к которым больше нечего добавить и убавить","Список книг, который церковь имеет право дополнять новыми откровениями","Собрание книг, признанных святыми отцами выше Писания","39 книг Ветхого и 27 книг Нового Завета, равные по авторитету преданию"],correct:0,why:"Канон — 66 книг, к которым нечего добавить и убавить."},
-{book:"Глава 2",category:"Определение",q:"Что такое непогрешимость?",a:["Писание в первоначальной рукописи не содержит ошибок; всё сказанное в Библии по той или иной теме является истиной","Переводы Писания безошибочны во всех изданиях","Писание содержит истину только по вопросам спасения","Все толкования Писания безошибочны"],correct:0,why:"Непогрешимость — отсутствие ошибок в оригинальных рукописях."},
-{book:"Глава 2",category:"Определение",q:"Что такое авторитетность Писания?",a:["Все слова Писания — слова Бога; неверие или неповиновение этим словам означает неверие в Бога или неповиновение Ему","Писание — главный авторитет, но его можно дополнить преданием и постановлениями пап","Писание — авторитет в вопросах веры, наука — в вопросах природы","Писание авторитетно, только если правильно истолковано церковью"],correct:0,why:"Авторитетность — Писание есть единственный верный абсолютный авторитет в жизни человека."},
-{book:"Глава 2",category:"Определение",q:"Что такое ясность Писания?",a:["Смысл Писания выражен и передан так, чтобы это было понятно последующим читателям","Писание понятно только специалистам со знанием языков","Писание понятно только после особого откровения Духа","Писание ясно в вопросах спасения, но не в остальном"],correct:0,why:"Ясность — Писание понятно последующим читателям."},
-{book:"Глава 2",category:"Тема",q:"Что относится к личности толкователя (5 элементов)?",a:["Возрождение, святость, желание, дисциплина, молитва","Образование, знание языков, степень, авторитет, опыт","Ум, память, интуиция, красноречие, харизма","Возраст, пол, национальность, культура, опыт"],correct:0,why:"Возрождение, святость, желание, дисциплина, молитва."},
-{book:"Глава 2",category:"Определение",q:"Что такое святость согласно курсу?",a:["Отделённость для Бога","Отсутствие греха в поступках","Соблюдение религиозных обрядов","Отказ от земных благ"],correct:0,why:"Святость — отделённость для Бога; главное свойство Бога — несравненность и непостижимость."},
-{book:"Глава 3",category:"Определение",q:"Что такое рационализм как ошибка толкования?",a:["Ошибка, основанная на вере в абсолютный авторитет человеческого разума, отвергающая Божье всемогущество","Ошибка, основанная на преувеличенной роли человеческих чувств","Ошибка, пренебрегающая наличием образной речи","Ошибка, основанная на заранее определённой системе"],correct:0,why:"Рационализм — абсолютный авторитет разума, отвергающий Божье всемогущество."},
-{book:"Глава 3",category:"Пример",q:"Что является примером рационализма?",a:["Объяснение перехода через море отливом или мелководьем","Поиск духовного смысла в каждой детали рассказа о Каине","Толкование текста в свете заранее принятого богословия","Построение доктрины на одном стихе без контекста"],correct:0,why:"Переход через море объясняют отливом, хотя текст говорит о воде, стоящей стеной."},
-{book:"Глава 3",category:"Определение",q:"Что такое мистицизм?",a:["Ошибка, основанная на преувеличенной роли человеческих чувств","Ошибка, основанная на разуме","Ошибка, пренебрегающая образной речью","Ошибка, отрицающая объективную истину"],correct:0,why:"Мистицизм — преувеличенная роль чувств, внутренних голосов, снов."},
-{book:"Глава 3",category:"Определение",q:"Что такое буквализм?",a:["Ошибка, пренебрегающая наличием образной речи в Писании","Толкование текста в его прямом смысле","Толкование, при котором буквальный смысл отрицается","Толкование с учётом исторического контекста"],correct:0,why:"Буквализм игнорирует образную речь."},
-{book:"Глава 3",category:"Определение",q:"Что такое аллегоризм?",a:["Ошибка, при которой ищется более глубокий «духовный смысл» текста, пренебрегая историко-грамматическим контекстом","Ошибка, при которой используется только буквальный смысл","Правильное понимание притчи","Толкование видений с учётом их формы"],correct:0,why:"Аллегоризм навязывает тексту символический смысл без основания."},
-{book:"Глава 3",category:"Определение",q:"Что такое догматизм?",a:["Ошибка, основанная на заранее определённой богословской системе","Ошибка, при которой текст толкуется без богословской системы","Правильное использование систематического богословия","Ошибка, при которой разные отрывки цитируются без контекста"],correct:0,why:"Догматизм подгоняет текст под систему."},
-{book:"Глава 3",category:"Определение",q:"Что такое «цитирование» как ошибка толкования?",a:["Ошибка, при которой разные отрывки цитируются без учёта их контекста для подтверждения уже готовой идеи","Использование перекрёстных ссылок для исследования","Правильное подтверждение идеи несколькими стихами в их контексте","Ошибка, при которой текст подгоняется под систему"],correct:0,why:"Цитирование — «благочестивый пулемёт» — стихи без учёта контекста."},
-{book:"Глава 3",category:"Определение",q:"Что такое контекстуализация как ошибка?",a:["Ошибка, основанная на преувеличенном влиянии культуры, в которой находится толкователь","Правильное применение текста к современной культуре","Ошибка, при которой разные отрывки цитируются вне контекста","Использование культурного фона для понимания текста"],correct:0,why:"Контекстуализация в этой классификации — подчинение Писания современной культуре."},
-{book:"Глава 3",category:"Определение",q:"Что такое интеграция как ошибка?",a:["Ошибка, пытающаяся согласовать учение Писания с наукой, психологией и философией","Правильное использование научных данных для иллюстрации","Использование философии для понимания Писания","Ошибка, при которой Писание отрывается от реальности"],correct:0,why:"Интеграция — подчинение Писания внешним системам."},
-{book:"Глава 3",category:"Определение",q:"Что такое постмодернизм как ошибка?",a:["Ошибка, отрицающая существование объективной истины, применимой ко всем людям во все времена","Ошибка, при которой истина проверяется только разумом","Философское течение, признающее объективную истину","Ошибка, связанная с преувеличением культуры"],correct:0,why:"Постмодернизм отрицает объективную истину."},
-{book:"Глава 3",category:"Пример",q:"Какое учение о Боге приписывают мормонам в курсе как пример буквализма?",a:["Бог имеет человеческое тело","Бог есть дух","Бог не имеет частей","Бог вездесущ"],correct:0,why:"Мормоны понимают упоминания частей тела Бога буквально; но Бог есть дух (Ин. 4:24)."},
-{book:"Глава 3",category:"Пример",q:"Какое толкование истории об одержимом и свиньях (Лк. 8) приводит автор как пример собственной ошибки?",a:["Свиньи — неверующие, их гибель в озере — окончательное осуждение","Свиньи — язычники, которых Христос отверг","Свиньи — символ фарисеев","Свиньи — образ демонов"],correct:0,why:"Автор рассказывает, как когда-то объяснял свиней как неверующих, но отказался от этого толкования."},
-{book:"Глава 4",category:"Определение",q:"Что такое историко-грамматический метод?",a:["Метод исследования Библии под руководством Духа Святого для выявления авторского значения текста в соответствии с правилами грамматики и историческими фактами","Метод, позволяющий читателю стать соавтором текста и создавать собственный смысл","Метод аллегорического толкования с поиском скрытых смыслов","Метод поиска духовного смысла через мистический опыт"],correct:0,why:"Определение историко-грамматического метода дано на слайде 4.1."},
-{book:"Глава 4",category:"Определение",q:"Что такое герменевтика?",a:["Наука и искусство, изучающие правила и принципы, необходимые для правильного толкования Библии","Процесс применения принципов толкования для выявления значения текста","Внесение своего смысла в библейский текст","Практическое исполнение принципов в жизни"],correct:0,why:"Герменевтика — наука и искусство правил толкования."},
-{book:"Глава 4",category:"Определение",q:"Что такое экзегетика?",a:["Процесс применения принципов герменевтики для выявления значения текста Писания","Наука о правилах толкования","Внесение своего смысла в библейский текст","Практическое исполнение принципов в жизни"],correct:0,why:"Экзегетика — процесс применения герменевтики, выведение смысла из текста."},
-{book:"Глава 4",category:"Определение",q:"Что такое эйзегетика?",a:["Внесение своего смысла в библейский текст","Выведение смысла из текста","Правила толкования Библии","Практическое исполнение"],correct:0,why:"Эйзегетика — введение своего смысла в текст, противоположность экзегезе."},
-{book:"Глава 4",category:"Определение",q:"Что такое применение?",a:["Практическое исполнение в повседневной жизни принципов, полученных путём толкования библейского текста","Процесс определения авторского смысла","Наука о правилах толкования","Правила истолкования текста"],correct:0,why:"Применение — исполнение понятого принципа в жизни."},
-{book:"Глава 4",category:"Определение",q:"Что такое экспозиционная проповедь?",a:["Вид проповеди, который выражается в систематичном проповедовании Библии по книгам от начала до конца","Проповедь на один законченный логический отрывок","Проповедь, исходящая из выбранной темы","Проповедь, направленная на объяснение текста"],correct:0,why:"Экспозиционная — по книгам от начала до конца."},
-{book:"Глава 4",category:"Тема",q:"Какие виды проповеди разобраны в курсе?",a:["Экспозиционная, текстуальная, тематическая, разъяснительная","Экспозиционная, аллегорическая, мистическая, рационалистическая","Учебная, евангелизационная, миссионерская, пастырская","Пророческая, апостольская, учительская, евангелистская"],correct:0,why:"Четыре вида: экспозиционная, текстуальная, тематическая, разъяснительная."},
-{book:"Глава 4",category:"Тема",q:"Какие пять принципов толкования выделены в курсе?",a:["Авторский смысл, единозначность, контекст, буквальное толкование, аналогия Писания","Авторский смысл, разум, чувства, традиция, культура","Буквализм, аллегоризм, догматизм, мистицизм, рационализм","Буквальный смысл, скрытый смысл, мистический, аллегорический, духовный"],correct:0,why:"Пять принципов: авторский смысл, единозначность, контекст, буквальное толкование, аналогия Писания."},
-{book:"Глава 4",category:"Определение",q:"Что такое авторское значение?",a:["То, что автор намеревался выразить, используя определённые слова и грамматику языка, на котором он писал","Значение, которое читатель находит в тексте","Значение, которое определяет церковь","Значение, которое даёт Святой Дух читателю"],correct:0,why:"Авторское значение — то, что намеревался выразить автор."},
-{book:"Глава 4",category:"Определение",q:"Что такое единозначность?",a:["Текст имеет одно единственное значение в своём контексте — то, которое вложил автор","Слово имеет несколько словарных значений, и все они применимы","У каждого читателя своё значение текста","У текста есть буквальный и духовный смысл одновременно"],correct:0,why:"Единозначность — одно значение в контексте."},
-{book:"Глава 4",category:"Определение",q:"Что такое контекст?",a:["Смысловое единство отрывка, все его детали, при помощи которых отрывок получается сотканным в единое целое","Только окружающие стихи","Только исторический фон","Только словарное значение слова"],correct:0,why:"Контекст — смысловое единство отрывка."},
-{book:"Глава 4",category:"Тема",q:"Какие четыре уровня контекста выделены в курсе?",a:["Ближайший контекст, контекст книги, контекст завета, контекст всей Библии","Ближайший, широкий, всеобщий, абсолютный","Стиха, главы, книги, всей Библии","Буквальный, исторический, культурный, духовный"],correct:0,why:"Четыре вложенных уровня контекста."},
-{book:"Глава 4",category:"Определение",q:"Что такое буквальное толкование?",a:["Толкование текста в его прямом смысле, значении","Игнорирование образной речи","Поиск духовного смысла","Толкование с учётом контекста"],correct:0,why:"Буквальное толкование — прямое значение, учитывающее образную речь."},
-{book:"Глава 4",category:"Определение",q:"Что такое аналогия Писания?",a:["Библия есть единая, последовательная, гармоничная система веры; правильно понятые отрывки не противоречат другим","Проверка результата на соответствие нашим собственным убеждениям","Согласование Писания с наукой и философией","Толкование одного отрывка другим без исследования"],correct:0,why:"Аналогия Писания — проверка результата Библией, а не нашими убеждениями."},
-{book:"Глава 4",category:"Пример",q:"Как правильно понимать Флп. 4:13 «Всё могу в укрепляющем меня Иисусе»?",a:["Павел научился довольству в достатке и нужде — это свидетельство приобретённого умения","Обещание успеха в любом замысле","Обещание физической силы в спорте","Обещание избавления от всех болезней"],correct:0,why:"Флп. 4:10–12 раскрывает контекст — довольство в достатке и нужде."},
-{book:"Глава 4",category:"Пример",q:"Как правильно понимать Мф. 18:20 «Где двое или трое собраны во имя Моё»?",a:["Относится к церковной дисциплине — наставлению и исправлению согрешающего","Определяет минимум церкви в 2-3 человека","Даёт право двум людям самостоятельно отлучать","Обещает Христа там, где собираются два христианина"],correct:0,why:"Мф. 18:15–20 — контекст церковной дисциплины."},
-{book:"Глава 4",category:"Пример",q:"Как правильно понимать 1 Кор. 3:16 «Вы — храм Божий»?",a:["Храм Божий — поместная церковь (в этом отрывке)","Храм Божий — тело каждого верующего (здесь)","Храм Божий — небесный Иерусалим","Храм Божий — здание храма в Иерусалиме"],correct:0,why:"1 Кор. 3:16–17 — о поместной церкви; тело верующего — 1 Кор. 6:19."},
-{book:"Глава 4",category:"Пример",q:"Что такое «новая герменевтика», которую отвергает курс?",a:["Учение о «смерти автора», при котором право создавать значение передаётся читателю","Учение о необходимости учитывать исторический контекст","Учение об аналогии Писания","Учение о буквальном толковании"],correct:0,why:"Курс отвергает «новую герменевтику» — читатель не становится соавтором."},
-{book:"Глава 5",category:"Определение",q:"Что такое наблюдение?",a:["Процесс сбора и систематизации той информации, которая есть в тексте","Процесс определения смысла текста","Процесс применения принципов","Процесс истолкования"],correct:0,why:"Наблюдение — сбор и систематизация информации из текста."},
-{book:"Глава 5",category:"Тема",q:"Какие шесть действий включает наблюдение?",a:["Подготовка текста, перечитывание, составление плана, определение ключевой идеи, запись вопросов, изучение исторического фона","Чтение, молитва, пост, размышление, запись, проверка","Молитва, чтение, толкование, применение, молитва, проверка","Проверка переводов, аналогия Писания, контекст, буквальное толкование, авторский смысл, единозначность"],correct:0,why:"Шесть действий наблюдения: подготовка, перечитывание, план, ключевая идея, вопросы, исторический фон."},
-{book:"Глава 5",category:"Определение",q:"Что такое ключевая идея?",a:["Краткое выражение того, о чём этот отрывок, что самое главное хотел нам сообщить автор","Главная тема всей книги","Первый стих отрывка","Значение, которое определяет церковь"],correct:0,why:"Ключевая идея — краткое выражение главной мысли отрывка."},
-{book:"Глава 5",category:"Определение",q:"Что такое исторический фон?",a:["Информация об исторической ситуации написания книги (кто автор, дата написания, историческая обстановка)","Исторический контекст каждого отдельного стиха","Культурные особенности эпохи","Географические сведения о местах событий"],correct:0,why:"Исторический фон — информация о ситуации написания книги."},
-{book:"Глава 5",category:"Практика",q:"Сколько раз рекомендуется прочитать Книгу Ионы в задании курса?",a:["30 раз","10 раз","5 раз","3 раза"],correct:0,why:"Задание: прочитайте Иону 30 раз, каждое прочтение — от начала до конца."},
-{book:"Глава 6",category:"Тема",q:"Какие четыре барьера понимания Библии выделены в курсе?",a:["Языковой, исторический, географический, культурный","Языковой, культурный, духовный, религиозный","Исторический, географический, культурный, психологический","Личный, семейный, церковный, общественный"],correct:0,why:"Четыре барьера: языковой, исторический, географический, культурный."},
-{book:"Глава 6",category:"Определение",q:"Что такое культура согласно курсу?",a:["Все способы и средства, материальные и социальные, посредством которых люди поддерживают своё существование","Только искусство и литература","Только обычаи и традиции","Только язык и письменность"],correct:0,why:"Культура — все способы и средства поддержания существования."},
-{book:"Глава 6",category:"Пример",q:"Что означает слово «позорище» в 1 Кор. 4:9?",a:["Зрелище в театре, где перед зрителями могли выступать приговорённые к смерти","Публичный позор","Площадь для торговли","Собрание верующих"],correct:0,why:"«Позорище» — зрелище в театре."},
-{book:"Глава 7",category:"Определение",q:"Что такое этимология?",a:["Раздел лингвистики, изучающий происхождение слов","Раздел грамматики, изучающий значение слов","Раздел грамматики, изучающий связь слов в предложении","Наука о первоначальном виде текста"],correct:0,why:"Этимология — происхождение слов."},
-{book:"Глава 7",category:"Определение",q:"Что такое лексика?",a:["Раздел грамматики, изучающий значение слов","Наука о происхождении слов","Наука о связи слов в предложении","Наука о фигурах речи"],correct:0,why:"Лексика — значение слов."},
-{book:"Глава 7",category:"Определение",q:"Что такое синтаксис?",a:["Раздел грамматики, изучающий связь слов в предложении","Наука о значении слов","Наука о происхождении слов","Наука о фигурах речи"],correct:0,why:"Синтаксис — связь слов в предложении."},
-{book:"Глава 7",category:"Определение",q:"Что такое фигура речи?",a:["Слова и выражения, используемые в переносном смысле, изменяющие эмоциональную окраску речи","Слова в прямом смысле","Слова с несколькими значениями","Устаревшие слова"],correct:0,why:"Фигура речи — слово в переносном смысле."},
-{book:"Глава 7",category:"Определение",q:"Что такое плеоназм?",a:["Излишество — например, «не вспомнил… но забыл»","Повторение в начале","Слова, похожие по звучанию","Одно через два"],correct:0,why:"Плеоназм — излишество."},
-{book:"Глава 7",category:"Определение",q:"Что такое парономазия?",a:["Слова, похожие по звучанию, но разные по значению","Излишество","Одно через два","Замена неприемлемых выражений"],correct:0,why:"Парономазия — созвучие слов с разным значением."},
-{book:"Глава 7",category:"Определение",q:"Что такое гендиадис?",a:["Одно через два — например, «сера и огонь» описывают одно событие суда","Излишество","Слова, похожие по звучанию","Замена неприемлемых выражений"],correct:0,why:"Гендиадис — выражение одного понятия через два слова."},
-{book:"Глава 7",category:"Определение",q:"Что такое эвфемизм?",a:["Замена неприемлемых выражений более мягкими — например, «покрыл ноги свои» (Суд. 3:24)","Излишество","Одно через два","Слова, похожие по звучанию"],correct:0,why:"Эвфемизм — замена неприемлемых выражений."},
-{book:"Глава 7",category:"Пример",q:"Какая фигура речи в Притч. 3:16 «Долгоденствие — в правой руке её, а в левой — богатство и слава»?",a:["Хиазм","Метафора","Метонимия","Гипербола"],correct:0,why:"Крестообразное расположение A-B-B'-A' — хиазм."},
-{book:"Глава 7",category:"Пример",q:"Что такое антропоморфизм?",a:["Представление кого-либо как человека — например, «рука Бога»","Представление животного как человека","Представление неживого как живого","Преувеличение"],correct:0,why:"Антропоморфизм — представление кого-либо как человека."},
-{book:"Глава 8",category:"Тема",q:"Какова главная мысль Псалма 1?",a:["Путь праведного угоден Господу, а путь нечестивого приведёт в погибель","Бог награждает богатством праведников в этой жизни","Нечестивые всегда наказываются уже здесь, на земле","Закон Моисея — единственный путь спасения"],correct:0,why:"Идея Пс. 1: путь праведного угоден Богу, путь нечестивого — в погибель."},
-{book:"Глава 8",category:"Тема",q:"Что означает «знает Господь путь праведных» (Пс. 1:6)?",a:["Личное участие и общение Бога с праведными, а не просто осведомлённость","Осведомлённость Бога о факте","Теоретическое знание","Признание заслуг"],correct:0,why:"«Знает» здесь означает личное участие и общение."},
-{book:"Глава 8",category:"Пример",q:"Что означает «прах» в Пс. 1:4?",a:["Мякина, полова, шелуха, которую ветер уносит при веянии зерна","Пыль дорожная","Пепел","Земля"],correct:0,why:"Прах в этом контексте — мякина, полова, шелуха."},
-{book:"Глава 9",category:"Определение",q:"Что такое описательный отрывок?",a:["Текст Писания, описывающий какое-либо событие или заповедь, которые не имеют обязательной силы для христиан напрямую","Текст Писания, указывающий на обязательность его исполнения для всех","Повествовательный текст, который нужно понимать аллегорически","Отрывок с описанием природы"],correct:0,why:"Описательный — описывает событие, не обязательное для христиан напрямую."},
-{book:"Глава 9",category:"Определение",q:"Что такое нормативный отрывок?",a:["Текст Писания, который указывает на обязательность его исполнения для всех","Текст, описывающий событие без обязательной силы","Текст с заповедью для конкретного человека","Текст, который можно исполнить буквально"],correct:0,why:"Нормативный — обязательный для всех."},
-{book:"Глава 9",category:"Тема",q:"Какие шесть направлений вопросов для применения приведены в курсе?",a:["Бог, учение, повеление, обетование, подражание, неверные действия","Что, где, когда, почему, как, зачем","Кто, что, где, когда, почему, как","Личное, семейное, церковное, общественное, культурное, историческое"],correct:0,why:"Шесть направлений: Бог, учение, повеление, обетование, подражание, неверные действия."},
-{book:"Глава 9",category:"Пример",q:"Какой пример описательного отрывка приведён в курсе (адресованное повеление)?",a:["Иона должен был идти в Ниневию (Ион. 1:1–2)","Великое поручение (Мф. 28:19–20)","Заповедь о любви к Богу (Мф. 22:37)","Заповедь о любви к ближнему (Мф. 22:39)"],correct:0,why:"Иона должен был идти в Ниневию — это не приказ каждому читателю."},
-{book:"Глава 10",category:"Автор",q:"Что говорится об авторе книги Ионы?",a:["Принимаем авторство Ионы: его личная молитва, переживания и подробности известны лучше всего участнику; это вывод из содержания, а не авторская подпись","Автором назван Моисей","Автором назван Ездра","Книга прямо объявляет анонимного автора"],correct:0,why:"Принимаем авторство Ионы как вывод из содержания, а не авторская подпись."},
-{book:"Глава 10",category:"Жанр",q:"К какому жанру относится книга Ионы?",a:["Историческое повествование с поэтической молитвой внутри","Собрание пророческих речей","Нравоучительная аллегория","Притча"],correct:0,why:"Иона — историческое повествование, внутри которого поэтическая молитва."},
-{book:"Глава 10",category:"Автор",q:"Что означает имя «Иона»?",a:["Голубь","Мир","Свет","Радость"],correct:0,why:"Имя Иона означает «голубь»; так назван и голубь, выпущенный Ноем."},
-{book:"Глава 10",category:"Тема",q:"Какова ключевая идея книги Ионы?",a:["Бог милостив и к евреям, и к язычникам; Израиль должен возвещать эту милость другим народам","Бог наказывает непослушных пророков","Покаяние язычников обличает Израиль, который не кается","Иона — пример для подражания во всём"],correct:0,why:"Ключевая идея: Бог милостив к язычникам, Израиль должен возвещать милость."},
-{book:"Глава 10",category:"Пример",q:"Почему книгу Ионы нельзя считать притчей или мифом?",a:["Иисус ссылается на Иону как на исторический пример Своего трёхдневного пребывания во гробе (Мф. 12:39–41)","Книга слишком длинная для притчи","Книга входит в число малых пророков","Книга содержит исторические детали"],correct:0,why:"Главный аргумент — свидетельство Иисуса (Мф. 12:39–41)."},
-{book:"Глава 10",category:"Тема",q:"Какие пять повторяющихся тем выделены в книге Ионы?",a:["Схождение, бросание, взывание, величие, назначение","Молитва, пост, покаяние, прощение, наказание","Грех, суд, милость, спасение, восстановление","Любовь, вера, надежда, смирение, послушание"],correct:0,why:"Повторяющиеся темы: схождение, бросание, взывание, величие, назначение."},
-{book:"Глава 10",category:"Пример",q:"Почему фраза «крепко заснул» (Ион. 1:5) требует внимания?",a:["Стоит редкое слово радам, означающее оцепенение от страха, а не обычный сон","В тексте просто сказано «заснул»","Это обычное слово для сна","Это слово о смерти"],correct:0,why:"Радам — редкое слово, означающее оцепенение от страха."}
-];
-
-const MATCH_BS = [
-{type:"match",books:["Глава 4"],q:"Сопоставьте понятия герменевтики с их определениями",leftLabel:"Понятие",rightLabel:"Определение",
- pairs:[{left:"Герменевтика",right:"Наука и искусство правил толкования"},{left:"Экзегетика",right:"Выведение смысла из текста"},{left:"Эйзегетика",right:"Внесение своего смысла в текст"},{left:"Применение",right:"Практическое исполнение понятого"},{left:"Экспозиция",right:"Объяснение текста другим людям"}],why:"Определения из главы 4."},
-{type:"match",books:["Глава 3"],q:"Сопоставьте ошибки толкования с их определениями",leftLabel:"Ошибка",rightLabel:"Определение",
- pairs:[{left:"Рационализм",right:"Абсолютный авторитет человеческого разума"},{left:"Мистицизм",right:"Преувеличенная роль человеческих чувств"},{left:"Буквализм",right:"Игнорирование образной речи"},{left:"Аллегоризм",right:"Поиск духовного смысла без основания"},{left:"Догматизм",right:"Подгонка текста под готовую систему"},{left:"Цитирование",right:"Стихи без учёта контекста"},{left:"Контекстуализация",right:"Подчинение Писания современной культуре"},{left:"Интеграция",right:"Согласование с наукой, психологией, философией"},{left:"Постмодернизм",right:"Отрицание объективной истины"}],why:"Девять ошибок толкования из главы 3."},
-{type:"match",books:["Глава 2"],q:"Сопоставьте свойства Писания с их определениями",leftLabel:"Свойство",rightLabel:"Определение",
- pairs:[{left:"Богодухновенность",right:"Дух руководил авторами в мыслях и словах"},{left:"Каноничность",right:"66 книг, к которым нечего добавить"},{left:"Непогрешимость",right:"Оригинальные рукописи без ошибок"},{left:"Авторитетность",right:"Слова Бога; неверие им = неверие Богу"},{left:"Ясность",right:"Понятно последующим читателям"}],why:"Пять свойств Писания из главы 2."},
-{type:"match",books:["Глава 2"],q:"Сопоставьте теории богодухновенности с их описаниями",leftLabel:"Теория",rightLabel:"Описание",
- pairs:[{left:"Интуиции",right:"Авторы — религиозные гении с природным талантом"},{left:"Просветления",right:"Усиление обычных способностей, без особого руководства"},{left:"Динамическая",right:"Дух руководил мыслями, слова выбирал автор"},{left:"Вербальная",right:"Дух руководил и мыслями, и словами (принимаем)"},{left:"Надиктовывания",right:"Прямая диктовка всей Библии"}],why:"Пять теорий богодухновенности из главы 2."},
-{type:"match",books:["Глава 2"],q:"Сопоставьте пять элементов личности толкователя с их характеристикой",leftLabel:"Элемент",rightLabel:"Характеристика",
- pairs:[{left:"Возрождение",right:"Открывает понимание Писания (Ин. 3:3)"},{left:"Святость",right:"Отделённость для Бога"},{left:"Желание",right:"Хефец — удовольствие от закона (Пс. 1:2)"},{left:"Дисциплина",right:"Усердие в исследовании, как у спортсмена"},{left:"Молитва",right:"Просьба о понимании (Пс. 118:27)"}],why:"Пять элементов личности толкователя из главы 2."},
-{type:"match",books:["Глава 7"],q:"Сопоставьте фигуры речи с их определениями",leftLabel:"Фигура",rightLabel:"Определение",
- pairs:[{left:"Плеоназм",right:"Излишество"},{left:"Парономазия",right:"Слова похожие по звучанию"},{left:"Гендиадис",right:"Одно через два"},{left:"Эвфемизм",right:"Замена неприемлемых выражений"},{left:"Хиазм",right:"Крестообразное расположение"},{left:"Метафора",right:"Перенос, неявное сравнение"},{left:"Гипербола",right:"Преувеличение"},{left:"Литота",right:"Преуменьшение"}],why:"Фигуры речи из главы 7."},
-{type:"match",books:["Глава 9"],q:"Сопоставьте направления вопросов для применения",leftLabel:"Направление",rightLabel:"Вопрос",
- pairs:[{left:"Бог",right:"Что текст открывает о Нём"},{left:"Учение",right:"Какую истину принять"},{left:"Повеление",right:"Что исполнять"},{left:"Обетование",right:"На какое обетование положиться"},{left:"Подражание",right:"Какой образец перенять"},{left:"Неверные действия",right:"Каких ошибок избегать"}],why:"Шесть направлений применения из главы 9."},
-{type:"match",books:["Глава 1"],q:"Сопоставьте четыре мотива изучения Библии с их содержанием",leftLabel:"Мотив",rightLabel:"Содержание",
- pairs:[{left:"Познавать истину",right:"Ин. 17:17 — «Слово Твоё есть истина»"},{left:"Познавать Бога",right:"Откровение в словах, действиях, Сыне"},{left:"Возрастать в Боге",right:"Дух изменяет по образу Христа (Еф. 4)"},{left:"Противостоять лжеучителям",right:"Защита людей от искажения истины"}],why:"Четыре мотива из главы 1."}
-];
-
-/* ============================================================
-   ПОДГОТОВКА ДАННЫХ
-   ============================================================ */
-[...QUESTIONS_OT, ...MATCH_OT].forEach(q => { q.subject = 'ot'; q.type = q.type || 'single'; });
-[...QUESTIONS_BS, ...MATCH_BS].forEach(q => { q.subject = 'bs'; q.type = q.type || 'single'; });
-const ALL_QUESTIONS = [...QUESTIONS_OT, ...MATCH_OT, ...QUESTIONS_BS, ...MATCH_BS];
-
-const BOOKS_OT = ["Бытие","Исход","Левит","Числа","Второзаконие","Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","1 Паралипоменон","2 Паралипоменон","Ездра","Неемия","Есфирь","Иов","Псалтирь","Притчи","Екклесиаст","Песнь песней","Исаия","Иеремия","Плач Иеремии","Иезекииль","Даниил","Осия","Иоиль","Амос","Авдий","Иона","Михей","Наум","Аввакум","Софония","Аггей","Захария","Малахия"];
-const BOOKS_BS = ["Глава 1","Глава 2","Глава 3","Глава 4","Глава 5","Глава 6","Глава 7","Глава 8","Глава 9","Глава 10"];
-
-const CATEGORIES_OT = {
-  "Пятикнижие": ["Бытие","Исход","Левит","Числа","Второзаконие"],
-  "Исторические": ["Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","1 Паралипоменон","2 Паралипоменон","Ездра","Неемия","Есфирь"],
-  "Поэтические": ["Иов","Псалтирь","Притчи","Екклесиаст","Песнь песней"],
-  "Большие пророки": ["Исаия","Иеремия","Плач Иеремии","Иезекииль","Даниил"],
-  "Малые пророки": ["Осия","Иоиль","Амос","Авдий","Иона","Михей","Наум","Аввакум","Софония","Аггей","Захария","Малахия"]
-};
-const CATEGORIES_BS = {
-  "Гл. 1–2 · Введение": ["Глава 1","Глава 2"],
-  "Гл. 3 · Ошибки": ["Глава 3"],
-  "Гл. 4–5 · Метод": ["Глава 4","Глава 5"],
-  "Гл. 6–7 · Барьеры, фигуры": ["Глава 6","Глава 7"],
-  "Гл. 8–10 · Практика": ["Глава 8","Глава 9","Глава 10"]
-};
-
-const $ = id => document.getElementById(id);
-const LETTERS = ["А","Б","В","Г"];
-
-/* ============================================================
-   ПРОГРЕСС
-   ============================================================ */
-const STORAGE_KEY = "nbbQuiz_v6";
-let progress = loadProgress();
-function emptySubjectProgress(){ return { totalAnswered:0, totalCorrect:0, byBook:{}, byCategory:{}, rounds:[], streak:0, bestStreak:0 }; }
-function defaultProgress(){ return { ot: emptySubjectProgress(), bs: emptySubjectProgress() }; }
-function loadProgress(){
-  try{
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if(!raw) return defaultProgress();
-    const saved = JSON.parse(raw);
-    const p = defaultProgress();
-    if(saved.ot) p.ot = Object.assign(emptySubjectProgress(), saved.ot);
-    if(saved.bs) p.bs = Object.assign(emptySubjectProgress(), saved.bs);
-    return p;
-  }catch(e){ return defaultProgress(); }
-}
-function saveProgress(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }catch(e){} }
-function recordAnswer(subject, book, category, isCorrect){
-  const p = progress[subject];
-  p.totalAnswered++;
-  if(isCorrect) p.totalCorrect++;
-  if(!p.byBook[book]) p.byBook[book] = {a:0,c:0};
-  p.byBook[book].a++; if(isCorrect) p.byBook[book].c++;
-  if(!p.byCategory[category]) p.byCategory[category] = {a:0,c:0};
-  p.byCategory[category].a++; if(isCorrect) p.byCategory[category].c++;
-  if(isCorrect){ p.streak++; if(p.streak>p.bestStreak) p.bestStreak=p.streak; } else p.streak = 0;
-  saveProgress();
-}
-function recordRound(subject, data){
-  const p = progress[subject];
-  p.rounds.unshift(data);
-  if(p.rounds.length>20) p.rounds.pop();
-  saveProgress();
-}
-
-/* ============================================================
-   СОСТОЯНИЕ
-   ============================================================ */
-let currentSubject = null;
-let selectedBooks = new Set();
-let round = [], index = 0, correct = 0, answered = false, mistakes = [], roundMode = "";
-let matchState = null;
-const IS_MOBILE = () => window.innerWidth <= 640;
-function shuffle(a){ const x=[...a]; for(let i=x.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [x[i],x[j]]=[x[j],x[i]]; } return x; }
-
-function getBooks(){ return currentSubject === 'ot' ? BOOKS_OT : BOOKS_BS; }
-function getCategories(){ return currentSubject === 'ot' ? CATEGORIES_OT : CATEGORIES_BS; }
-function getModes(){ return currentSubject === 'ot' ? MODES_OT : MODES_BS; }
-
-function bookMatches(q, selectedSet){
-  if(selectedSet.size === 0) return true;
-  if(q.type === "match"){
-    if(!q.books) return false;
-    return q.books.some(b => selectedSet.has(b));
-  }
-  return selectedSet.has(q.book);
-}
-function filterBySubjectAndBooks(pool){
-  return pool.filter(q => q.subject === currentSubject && bookMatches(q, selectedBooks));
-}
-
-/* ============================================================
-   ХЕДЕР
-   ============================================================ */
-function updateHeader(){
-  const hr = $('headerRight');
-  if(!hr) return;
-  if(!currentSubject){
-    hr.innerHTML = `<div class="pill">Тренажёр НББС</div>`;
-  } else {
-    hr.innerHTML = `<div class="pill pill-btn" id="topPill">${SUBJECTS[currentSubject].name} · сменить</div>`;
-    const pill = hr.querySelector('#topPill');
-    if(pill) pill.onclick = backToSubject;
-  }
-}
-
-/* ============================================================
-   СТАТИСТИКА МЕНЮ
-   ============================================================ */
-function renderSubjectStats(){
-  ['ot','bs'].forEach(s => {
-    const p = progress[s];
-    const el = $('stats_' + s);
-    if(!el) return;
-    if(p.totalAnswered){
-      el.textContent = `${p.totalCorrect}/${p.totalAnswered} правильных (${Math.round(p.totalCorrect/p.totalAnswered*100)}%) · ${p.rounds.length} раундов`;
-    } else {
-      el.textContent = "Ещё не начато";
-    }
-  });
-}
-
-/* ============================================================
-   ВЫБОР ПРЕДМЕТА
-   ============================================================ */
-document.querySelectorAll('.subject-card').forEach(btn => {
-  btn.addEventListener('click', () => selectSubject(btn.dataset.subject));
-});
-
-function selectSubject(subj){
-  if(!SUBJECTS[subj]) return;
-  currentSubject = subj;
-
-  // Заголовок
-  updateHeader();
-
-  // Интро
-  $('introBrand').textContent = SUBJECTS[subj].name;
-  $('introTitle').textContent = SUBJECTS[subj].name;
-  $('introSub').textContent = SUBJECTS[subj].sub;
-  $('introNotice').textContent = SUBJECTS[subj].notice;
-  $('filterLabel').textContent = SUBJECTS[subj].filterLabel;
-  $('listTitle').textContent = SUBJECTS[subj].listTitle;
-  $('listSub').textContent = SUBJECTS[subj].listSub;
-
-  // Режимы
-  $('mode').innerHTML = getModes().map(m => `<option value="${m.v}">${m.l}</option>`).join('');
-
-  // Сброс фильтров
-  selectedBooks.clear();
-
-  // Booklist
-  const books = getBooks();
-  $('booklist').innerHTML = books.map(b => `<div class="book"><span>${b}</span><span class="bar" data-book="${b}"></span></div>`).join('');
-
-  // Категории
-  renderCategoryButtons();
-
-  // Фильтр
-  renderBookFilter();
-
-  // Прогресс
-  renderProgressPanel();
-
-  // Показ
-  $('subjectSelect').classList.add('hidden');
-  $('game').classList.add('hidden');
-  $('result').classList.add('hidden');
-  $('intro').classList.remove('hidden');
-
-  onBookSelectionChange();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-
-function backToSubject(){
-  currentSubject = null;
-  selectedBooks.clear();
-  updateHeader();
-  $('subjectSelect').classList.remove('hidden');
-  $('intro').classList.add('hidden');
-  $('game').classList.add('hidden');
-  $('result').classList.add('hidden');
-  renderSubjectStats();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
-$('backToSubject').addEventListener('click', backToSubject);
-
-/* ============================================================
-   КАТЕГОРИИ / ЧИПЫ / СЧЁТЧИК
-   ============================================================ */
-function renderCategoryButtons(){
-  const cats = getCategories();
-  $('catButtons').innerHTML = Object.keys(cats).map(cat => {
-    const n = cats[cat].length;
-    return `<button type="button" class="cat-btn" data-cat="${cat}">${cat}<span class="cnt">${n}</span></button>`;
-  }).join('');
-  $('catButtons').querySelectorAll('.cat-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cat = btn.dataset.cat;
-      const books = cats[cat];
-      const allSel = books.every(b => selectedBooks.has(b));
-      if(allSel){
-        books.forEach(b => selectedBooks.delete(b));
-        $('bookFilter').querySelectorAll('.book-chip').forEach(el => { if(books.includes(el.dataset.book)) el.classList.remove('selected'); });
-      } else {
-        books.forEach(b => selectedBooks.add(b));
-        $('bookFilter').querySelectorAll('.book-chip').forEach(el => { if(books.includes(el.dataset.book)) el.classList.add('selected'); });
-      }
-      onBookSelectionChange();
-    });
-  });
-}
-function updateCategoryButtonsState(){
-  const cats = getCategories();
-  $('catButtons').querySelectorAll('.cat-btn').forEach(btn => {
-    const cat = btn.dataset.cat;
-    const books = cats[cat];
-    const sel = books.filter(b => selectedBooks.has(b)).length;
-    btn.classList.remove('selected','partial');
-    if(sel === books.length) btn.classList.add('selected');
-    else if(sel > 0) btn.classList.add('partial');
-  });
-}
-function renderBookFilter(){
-  const books = getBooks();
-  $('bookFilter').innerHTML = books.map(b => `<button type="button" class="book-chip" data-book="${b}">${b}</button>`).join('');
-  $('bookFilter').querySelectorAll('.book-chip').forEach(el => {
-    el.addEventListener('click', () => {
-      const b = el.dataset.book;
-      if(selectedBooks.has(b)) selectedBooks.delete(b); else selectedBooks.add(b);
-      el.classList.toggle('selected');
-      onBookSelectionChange();
-    });
-  });
-}
-$('selectAllBooks').addEventListener('click', () => {
-  getBooks().forEach(b => selectedBooks.add(b));
-  $('bookFilter').querySelectorAll('.book-chip').forEach(el => el.classList.add('selected'));
-  onBookSelectionChange();
-});
-$('clearBooks').addEventListener('click', () => {
-  selectedBooks.clear();
-  $('bookFilter').querySelectorAll('.book-chip').forEach(el => el.classList.remove('selected'));
-  onBookSelectionChange();
-});
-function onBookSelectionChange(){
-  if(!currentSubject) return;
-  const total = getBooks().length;
-  const n = selectedBooks.size;
-  $('selectedCount').textContent = n === 0 ? `выбрано: 0 (всё)` : (n === total ? `выбрано: все ${n}` : `выбрано: ${n} из ${total}`);
-  updateCategoryButtonsState();
-  const available = filterBySubjectAndBooks(ALL_QUESTIONS);
-  $('totalLabel').textContent = `Доступно вопросов: ${available.length}${n > 0 ? " (по выбранному)" : " (всё)"}`;
-}
-
-/* ============================================================
-   ПРОГРЕСС-ПАНЕЛЬ
-   ============================================================ */
-function renderProgressPanel(){
-  if(!currentSubject) return;
-  const p = progress[currentSubject];
-  $('pTotalAns').textContent = p.totalAnswered;
-  $('pTotalCor').textContent = p.totalCorrect;
-  const acc = p.totalAnswered ? Math.round(p.totalCorrect / p.totalAnswered * 100) : 0;
-  $('pAcc').textContent = p.totalAnswered ? acc + '%' : '—';
-  $('pRounds').textContent = p.rounds.length;
-
-  const entries = Object.entries(p.byBook).filter(([,v]) => v.a > 0).sort((a,b) => (b[1].c/b[1].a) - (a[1].c/a[1].a));
-  const top = entries.slice(0, 12);
-  let detail = '';
-  if(top.length){
-    detail += `<h4 style="margin:6px 0">📚 По разделам</h4><div class="chart">`;
-    top.forEach(([book, v]) => {
-      const pct = Math.round(v.c/v.a*100);
-      const label = book.length > 8 ? book.slice(0,7)+'…' : book;
-      detail += `<div class="chart-bar" title="${book}: ${v.c}/${v.a} (${pct}%)"><div class="inner" style="height:${pct}%"></div><div class="lbl">${label}</div></div>`;
-    });
-    detail += `</div>`;
-  } else {
-    detail = `<p class="small">Начни игру — здесь появится статистика по разделам и категориям.</p>`;
-  }
-  $('progressDetail').innerHTML = detail;
-
-  if(p.rounds.length){
-    $('historyList').innerHTML = `<h4 style="margin:14px 0 6px">🕘 История раундов</h4>` +
-      p.rounds.slice(0,5).map(r => `<div class="history-item"><span>${r.mode} · ${r.correct}/${r.total} <span class="badge">${Math.round(r.correct/r.total*100)}%</span></span><span class="date">${new Date(r.ts).toLocaleDateString('ru-RU')}</span></div>`).join('');
-  } else {
-    $('historyList').innerHTML = '';
-  }
-
-  document.querySelectorAll('.bar[data-book]').forEach(el => {
-    const b = el.dataset.book;
-    const v = p.byBook[b];
-    if(v && v.a){ el.textContent = `${Math.round(v.c/v.a*100)}%`; el.style.color = v.c/v.a >= 0.7 ? '#49c58b' : '#e6bd70'; }
-    else el.textContent = '';
-  });
-}
-$('resetProgress').addEventListener('click', () => {
-  if(!currentSubject) return;
-  if(confirm(`Сбросить прогресс по предмету «${SUBJECTS[currentSubject].name}»?`)){
-    progress[currentSubject] = emptySubjectProgress();
-    saveProgress();
-    renderProgressPanel();
-  }
-});
-
-/* ============================================================
-   ИГРА
-   ============================================================ */
-function start(){
-  if(!currentSubject) return;
-  let pool = filterBySubjectAndBooks(ALL_QUESTIONS);
-  const mode = $('mode').value;
-  roundMode = $('mode').selectedOptions[0].textContent;
-
-  const modeMap = {
-    author: ['Автор','История'],
-    goal: ['Цель'],
-    theme: ['Тема','Ключевой стих'],
-    structure: ['Структура','Жанр'],
-    definition: ['Определение'],
-    example: ['Пример'],
-    keyverse: ['Ключевой стих']
-  };
-  if(mode === 'match') pool = pool.filter(q => q.type === 'match');
-  else if(mode === 'hard') pool = pool.filter(q => q.why && q.why.length > 60);
-  else if(mode === 'mixed') pool = shuffle(pool).slice(0, 20);
-  else if(modeMap[mode]) pool = pool.filter(q => q.type !== 'match' && modeMap[mode].includes(q.category));
-
-  if($('order').value === 'random') pool = shuffle(pool);
-  const count = $('count').value;
-  if(mode !== 'mixed' && count !== 'all') pool = pool.slice(0, Number(count));
-
-  if(!pool.length){
-    alert(`Для выбранного режима и фильтра нет вопросов. Попробуй расширить выбор или сменить режим.`);
-    return;
-  }
-  round = pool; index = 0; correct = 0; mistakes = []; matchState = null;
-  $('intro').classList.add('hidden');
-  $('result').classList.add('hidden');
-  $('game').classList.remove('hidden');
-  render();
-}
-
-function getShuffledOrder(q){
-  const idx = [0,1,2,3];
-  for(let a = 0; a < 10; a++){
-    const order = shuffle(idx);
-    const key = order.join(',');
-    if(key !== q._lastOrderKey){ q._lastOrderKey = key; return order; }
-  }
-  let order = shuffle(idx);
-  const shift = 1 + Math.floor(Math.random()*3);
-  order = order.slice(shift).concat(order.slice(0, shift));
-  q._lastOrderKey = order.join(',');
-  return order;
-}
-function getShuffledRightOrder(q){
-  const idx = q.pairs.map((_, i) => i);
-  for(let a = 0; a < 10; a++){
-    const order = shuffle(idx);
-    const key = order.join(',');
-    if(key !== q._lastRightOrderKey){ q._lastRightOrderKey = key; return order; }
-  }
-  let order = shuffle(idx);
-  const shift = 1 + Math.floor(Math.random()*(idx.length-1));
-  order = order.slice(shift).concat(order.slice(0, shift));
-  q._lastRightOrderKey = order.join(',');
-  return order;
-}
-
-function render(){
-  const q = round[index];
-  answered = false; matchState = null;
-  $('progressText').textContent = `Вопрос ${index+1} из ${round.length}`;
-  $('scoreText').textContent = `Верно: ${correct}`;
-  $('fill').style.width = `${index / round.length * 100}%`;
-  $('bookTag').textContent = q.book;
-  $('categoryTag').textContent = q.category;
-  $('qnum').textContent = `ВОПРОС ${String(index+1).padStart(2,'0')}${q.type === 'match' ? ' · СОПОСТАВЛЕНИЕ' : ''}`;
-  $('question').textContent = q.q;
-  $('feedback').className = 'feedback hidden'; $('feedback').textContent = '';
-  $('next').disabled = true;
-  $('next').textContent = index === round.length - 1 ? 'Показать результат' : 'Следующий →';
-  if(window.scrollY > 80) window.scrollTo({top:0, behavior:'smooth'});
-
-  if(q.type === 'match'){
-    renderMatch(q);
-  } else {
-    const order = getShuffledOrder(q);
-    const shuffledA = order.map(i => q.a[i]);
-    const newCorrect = order.indexOf(q.correct);
-    q._shuffled = shuffledA; q._correct = newCorrect;
-    $('answers').innerHTML = shuffledA.map((a, i) => `<button class="answer" data-i="${i}"><span class="letter">${LETTERS[i]}</span><span>${a}</span></button>`).join('');
-    $('answers').querySelectorAll('button').forEach(b => b.addEventListener('click', () => choose(Number(b.dataset.i))));
-  }
-}
-
-function renderMatch(q){
-  const rightOrder = getShuffledRightOrder(q);
-  matchState = { pairs: q.pairs, rightOrder, matchedLeft: new Set(), matchedRight: new Set(), selectedLeft: null, correctCount: 0 };
-  const leftHTML = q.pairs.map((p, i) => `<button type="button" class="match-item" data-side="left" data-idx="${i}">${p.left}</button>`).join('');
-  const rightHTML = rightOrder.map(i => `<button type="button" class="match-item" data-side="right" data-idx="${i}">${q.pairs[i].right}</button>`).join('');
-  $('answers').innerHTML = `
-    <div class="match-wrap">
-      <div class="match-selection-bar" id="matchSelBar"></div>
-      <div class="match-columns">
-        <div class="match-col"><div class="match-col-header">${q.leftLabel || 'Столбец A'}</div>${leftHTML}</div>
-        <div class="match-col"><div class="match-col-header">${q.rightLabel || 'Столбец B'}</div>${rightHTML}</div>
+    <div style="margin-top:26px">
+      <label style="font-size:15px;color:var(--text);font-weight:700" id="filterLabel">📚 Выбрать разделы</label>
+      <p class="filter-hint" id="filterHint">Не выбрано — вопросы из всего предмета. Выбрано — только из них. <strong id="selectedCount">выбрано: 0 (всё)</strong></p>
+      <div class="cat-buttons" id="catButtons"></div>
+      <div class="book-filter" id="bookFilter"></div>
+      <div>
+        <button type="button" class="mini-btn" id="selectAllBooks">Выбрать все</button>
+        <button type="button" class="mini-btn" id="clearBooks">Сбросить (всё)</button>
       </div>
-      <div class="match-progress"><div class="match-progress-fill" id="matchFill" style="width:0%"></div></div>
-      <div class="match-status" id="matchStatus">Совпадений: 0 из ${q.pairs.length}</div>
-      <div class="match-hint">${IS_MOBILE() ? 'Выбери элемент в верхнем списке, затем пару в нижнем ↓' : 'Кликни по элементу слева, затем по соответствующему справа'}</div>
-    </div>`;
-  $('answers').querySelectorAll('.match-item').forEach(el => el.addEventListener('click', onMatchClick));
-}
-function updateSelectionBanner(text){
-  const bar = $('matchSelBar'); if(!bar) return;
-  if(text){ bar.classList.add('active'); bar.innerHTML = `Выбрано: <strong>${text}</strong><span style="color:var(--muted);font-weight:normal">↓ теперь выберите пару ниже</span>`; }
-  else { bar.classList.remove('active'); bar.innerHTML = ''; }
-}
-function onMatchClick(e){
-  if(answered) return;
-  const el = e.currentTarget;
-  if(el.classList.contains('matched')) return;
-  const side = el.dataset.side;
-  const idx = Number(el.dataset.idx);
-  if(side === 'left'){
-    $('answers').querySelectorAll('.match-item[data-side="left"].selected').forEach(x => x.classList.remove('selected'));
-    el.classList.add('selected');
-    matchState.selectedLeft = idx;
-    updateSelectionBanner(matchState.pairs[idx].left);
-    return;
-  }
-  if(matchState.selectedLeft === null) return;
-  const leftIdx = matchState.selectedLeft;
-  if(leftIdx === idx){
-    matchState.matchedLeft.add(leftIdx); matchState.matchedRight.add(idx); matchState.correctCount++;
-    const leftEl = $('answers').querySelector(`.match-item[data-side="left"][data-idx="${leftIdx}"]`);
-    if(leftEl){ leftEl.classList.remove('selected'); leftEl.classList.add('matched'); }
-    el.classList.add('matched');
-    matchState.selectedLeft = null;
-    updateSelectionBanner(null);
-    const pct = Math.round(matchState.correctCount / matchState.pairs.length * 100);
-    const fill = $('matchFill'); if(fill) fill.style.width = pct + '%';
-    const st = $('matchStatus'); if(st) st.textContent = `Совпадений: ${matchState.correctCount} из ${matchState.pairs.length}`;
-    if(IS_MOBILE() && matchState.correctCount < matchState.pairs.length){
-      setTimeout(() => { const w = document.querySelector('.match-wrap'); if(w) w.scrollIntoView({behavior:'smooth', block:'start'}); }, 250);
-    }
-    if(matchState.correctCount === matchState.pairs.length) finishMatch();
-  } else {
-    el.classList.add('wrong-flash');
-    const leftEl = $('answers').querySelector(`.match-item[data-side="left"][data-idx="${leftIdx}"]`);
-    if(leftEl) leftEl.classList.add('wrong-flash');
-    setTimeout(() => { el.classList.remove('wrong-flash'); if(leftEl) leftEl.classList.remove('wrong-flash'); }, 500);
-    if(navigator.vibrate) navigator.vibrate(60);
-  }
-}
-function finishMatch(){
-  answered = true;
-  const q = round[index];
-  recordAnswer(currentSubject, q.book, q.category, true);
-  correct++;
-  const fb = $('feedback');
-  fb.classList.remove('hidden'); fb.classList.add('good');
-  fb.innerHTML = `<strong>✅ Все пары найдены верно!</strong><span>${q.why || ''}</span>`;
-  $('scoreText').textContent = `Верно: ${correct}`;
-  $('next').disabled = false;
-  if(navigator.vibrate) navigator.vibrate([40,40,40]);
-}
-function choose(n){
-  if(answered) return;
-  answered = true;
-  const q = round[index];
-  const good = n === q._correct;
-  recordAnswer(currentSubject, q.book, q.category, good);
-  if(good) correct++; else mistakes.push({q, chosen:n});
-  [...$('answers').children].forEach((b, i) => {
-    b.disabled = true;
-    if(i === q._correct) b.classList.add('correct');
-    else if(i === n) b.classList.add('wrong');
-  });
-  const fb = $('feedback');
-  fb.classList.remove('hidden'); fb.classList.add(good ? 'good' : 'bad');
-  fb.innerHTML = `<strong>${good ? '✅ Верно! Отличная работа.' : '❌ Не совсем. Правильный ответ: ' + LETTERS[q._correct] + '.'}</strong><span>${q.why}</span>`;
-  $('scoreText').textContent = `Верно: ${correct}`;
-  $('next').disabled = false;
-  if(navigator.vibrate) navigator.vibrate(good ? 30 : [40,40]);
-  if(IS_MOBILE()) setTimeout(() => fb.scrollIntoView({behavior:'smooth', block:'nearest'}), 100);
-}
-function finish(){
-  $('game').classList.add('hidden');
-  $('result').classList.remove('hidden');
-  const pct = Math.round(correct / round.length * 100);
-  $('finalScore').textContent = `${pct}%`;
-  $('resultText').textContent = `Правильных ответов: ${correct} из ${round.length}. ${pct >= 90 ? 'Отличное знание материала!' : pct >= 70 ? 'Хороший результат. Повтори вопросы с ошибками.' : pct >= 50 ? 'Есть основа — закрепи слабые места и сыграй ещё раз.' : 'Стоит повторить материал и пройти раунд снова.'}`;
-  $('missed').innerHTML = mistakes.length
-    ? `<h3>Что стоит повторить</h3>` + mistakes.map(m => {
-        if(m.q.type === 'match') return `<div class="feedback bad"><strong>${m.q.q}</strong><div class="small">${m.q.why || ''}</div></div>`;
-        return `<div class="feedback bad"><strong>${m.q.book}: ${m.q.q}</strong><div>Правильный ответ: ${m.q.a[m.q.correct]}</div><div class="small">${m.q.why}</div></div>`;
-      }).join('')
-    : '<h3>Без ошибок — так держать!</h3>';
-  recordRound(currentSubject, {ts:Date.now(), mode:roundMode, total:round.length, correct});
-  renderProgressPanel();
-  window.scrollTo({top:0, behavior:'smooth'});
-}
+    </div>
 
-$('start').addEventListener('click', start);
-$('next').addEventListener('click', () => { if(index < round.length - 1){ index++; render(); } else finish(); });
-$('quit').addEventListener('click', finish);
-$('again').addEventListener('click', start);
-$('home').addEventListener('click', () => { $('result').classList.add('hidden'); $('intro').classList.remove('hidden'); window.scrollTo({top:0, behavior:'smooth'}); });
+    <div class="setup-grid" style="margin-top:22px">
+      <div><label for="mode">Режим</label><select id="mode"></select></div>
+      <div><label for="count">Количество вопросов</label><select id="count">
+        <option value="10">10 вопросов</option>
+        <option value="20" selected>20 вопросов</option>
+        <option value="all">Все доступные</option>
+      </select></div>
+      <div><label for="order">Порядок</label><select id="order">
+        <option value="random">Случайный</option>
+        <option value="sequence">По порядку</option>
+      </select></div>
+      <div style="display:flex;align-items:flex-end">
+        <button class="primary" id="start" style="width:100%">Начать игру →</button>
+      </div>
+    </div>
+    <div class="startrow" style="margin-top:8px"><span class="small" id="totalLabel"></span></div>
 
-/* ============================================================
-   ИНИЦИАЛИЗАЦИЯ
-   ============================================================ */
-renderSubjectStats();
-updateHeader();
-</script></body></html>
+    <h3 style="margin:28px 0 4px" id="listTitle">Все разделы</h3>
+    <p class="small" id="listSub">Прогресс по разделу показан справа.</p>
+    <div class="booklist" id="booklist"></div>
+
+    <div class="startrow" style="margin-top:22px"><button class="secondary" id="backToSubject">← Сменить предмет</button></div>
+  </section>
+
+  <section id="game" class="card hidden">
+    <div class="stats"><span id="progressText"></span><span id="scoreText"></span></div>
+    <div class="track"><div class="fill" id="fill"></div></div>
+    <div class="meta"><span class="tag" id="bookTag"></span><span class="tag blue" id="categoryTag"></span></div>
+    <div class="qnum" id="qnum"></div>
+    <h2 class="question" id="question"></h2>
+    <div class="answers" id="answers"></div>
+    <div id="feedback" class="feedback hidden" aria-live="polite"></div>
+    <div class="controls"><button class="secondary" id="quit">Завершить</button><button class="primary" id="next" disabled>Следующий →</button></div>
+  </section>
+
+  <section id="result" class="card result hidden">
+    <div class="brand">Раунд завершён</div>
+    <h1>Результат</h1>
+    <div class="score" id="finalScore">0%</div>
+    <p id="resultText" class="sub" style="margin:0 auto 18px"></p>
+    <div class="startrow" style="justify-content:center">
+      <button class="primary" id="again">Сыграть ещё раз</button>
+      <button class="secondary" id="home">К настройкам</button>
+    </div>
+    <div id="missed" style="text-align:left;margin-top:22px"></div>
+  </section>
+
+  <footer>Работает офлайн · Прогресс хранится только на этом устройстве</footer>
+</div>
+
+<!-- DATA -->
+<script src="js/data/ot-questions.js"></script>
+<script src="js/data/ot-match.js"></script>
+<script src="js/data/bs-questions.js"></script>
+<script src="js/data/bs-match.js"></script>
+<script src="js/data/constants.js"></script>
+
+<!-- LOGIC -->
+<script src="js/state.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
