@@ -321,3 +321,53 @@ NBB.ui.resetProgress = function(){
     NBB.ui.renderProgressPanel();
   }
 };
+
+
+// ==== ТЕМА ====
+NBB.ui.updateThemeButton = function(){
+    const btn = document.getElementById('themeToggle');
+    if(!btn) return;
+    const mode = (NBB.state.progress.settings && NBB.state.progress.settings.theme) || 'auto';
+    const labels = { auto: 'Тема: авто', light: 'Тема: светлая', dark: 'Тема: тёмная' };
+    const icons  = { auto: '🌗', light: '☀️', dark: '🌙' };
+    btn.textContent = icons[mode] || '🌗';
+    btn.title = labels[mode] || 'Сменить тему';
+    btn.setAttribute('aria-label', btn.title);
+  };
+  
+  NBB.ui.applyTheme = function(mode){
+    const root = document.documentElement;
+    let effective = mode;
+    if(!mode || mode === 'auto'){
+      effective = (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches)
+        ? 'light' : 'dark';
+    }
+    root.setAttribute('data-theme', effective);
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      m.setAttribute('content', effective === 'light' ? '#f5f7fa' : '#101b2b');
+    });
+    NBB.ui.updateThemeButton();
+  };
+  
+  NBB.ui.cycleTheme = function(){
+    if(!NBB.state.progress.settings) NBB.state.progress.settings = { theme: 'auto' };
+    const cur = NBB.state.progress.settings.theme || 'auto';
+    const next = cur === 'auto' ? 'light' : cur === 'light' ? 'dark' : 'auto';
+    NBB.state.progress.settings.theme = next;
+    NBB.progress.save();
+    NBB.ui.applyTheme(next);
+  };
+  
+  NBB.ui.initTheme = function(){
+    const mode = (NBB.state.progress.settings && NBB.state.progress.settings.theme) || 'auto';
+    NBB.ui.applyTheme(mode);
+    if(window.matchMedia){
+      const mql = window.matchMedia('(prefers-color-scheme: light)');
+      const handler = function(){
+        const cur = (NBB.state.progress.settings && NBB.state.progress.settings.theme) || 'auto';
+        if(cur === 'auto') NBB.ui.applyTheme('auto');
+      };
+      if(mql.addEventListener) mql.addEventListener('change', handler);
+      else if(mql.addListener) mql.addListener(handler);
+    }
+  };

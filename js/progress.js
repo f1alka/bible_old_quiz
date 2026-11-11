@@ -7,7 +7,11 @@ function emptySubjectProgress(){
   return { totalAnswered:0, totalCorrect:0, byBook:{}, byCategory:{}, rounds:[], streak:0, bestStreak:0 };
 }
 function defaultProgress(){
-  return { ot: emptySubjectProgress(), bs: emptySubjectProgress() };
+  return {
+    ot: emptySubjectProgress(),
+    bs: emptySubjectProgress(),
+    settings: { theme: 'auto' }
+  };
 }
 
 NBB.progress.empty = emptySubjectProgress;
@@ -20,6 +24,7 @@ NBB.progress.load = function(){
     const p = defaultProgress();
     if(saved.ot) p.ot = Object.assign(emptySubjectProgress(), saved.ot);
     if(saved.bs) p.bs = Object.assign(emptySubjectProgress(), saved.bs);
+    if(saved.settings) p.settings = Object.assign({ theme: 'auto' }, saved.settings);
     return p;
   }catch(e){ return defaultProgress(); }
 };
@@ -48,5 +53,4 @@ NBB.progress.recordRound = function(subject, data){
   NBB.progress.save();
 };
 
-// Инициализация при загрузке
 NBB.state.progress = NBB.progress.load();

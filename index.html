@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#101b2b">
   <title>Тренажёр НББС</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="НББС">
+  <link rel="apple-touch-icon" href="icon.svg">
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -12,7 +17,10 @@
 
   <header>
     <div class="brand" id="brandName">Тренажёр НББС</div>
-    <div id="headerRight"></div>
+    <div class="header-actions">
+      <button id="themeToggle" class="pill pill-btn" title="Сменить тему" aria-label="Сменить тему">🌗</button>
+      <div id="headerRight"></div>
+    </div>
   </header>
 
   <!-- ЭКРАН ВЫБОРА ПРЕДМЕТА -->
@@ -115,14 +123,12 @@
   <footer>Работает офлайн · Прогресс хранится только на этом устройстве</footer>
 </div>
 
-<!-- DATA -->
 <script src="js/data/ot-questions.js"></script>
 <script src="js/data/ot-match.js"></script>
 <script src="js/data/bs-questions.js"></script>
 <script src="js/data/bs-match.js"></script>
 <script src="js/data/constants.js"></script>
 
-<!-- LOGIC -->
 <script src="js/state.js"></script>
 <script src="js/progress.js"></script>
 <script src="js/ui.js"></script>
