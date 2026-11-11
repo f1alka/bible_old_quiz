@@ -1,22 +1,39 @@
 window.NBB = window.NBB || {};
 window.NBB.data = window.NBB.data || {};
 
-// Если какой-то из массивов не загрузился — подставляем пустой, чтобы не падать
-if (!Array.isArray(NBB.data.otQuestions)) { console.warn('ot-questions.js не загружен'); NBB.data.otQuestions = []; }
-if (!Array.isArray(NBB.data.otMatch))     { console.warn('ot-match.js не загружен');     NBB.data.otMatch = []; }
-if (!Array.isArray(NBB.data.bsQuestions)) { console.warn('bs-questions.js не загружен'); NBB.data.bsQuestions = []; }
-if (!Array.isArray(NBB.data.bsMatch))     { console.warn('bs-match.js не загружен');     NBB.data.bsMatch = []; }
+// Защита от отсутствующих файлов
+if (!NBB.data.otQuestions) { console.warn('ot-questions.js не загружен'); NBB.data.otQuestions = []; }
+if (!NBB.data.otMatch)     { console.warn('ot-match.js не загружен');     NBB.data.otMatch = []; }
+if (!NBB.data.bsQuestions) { console.warn('bs-questions.js не загружен'); NBB.data.bsQuestions = []; }
+if (!NBB.data.bsMatch)     { console.warn('bs-match.js не загружен');     NBB.data.bsMatch = []; }
 
-NBB.data.otQuestions.forEach(function(q){ q.subject = 'ot'; q.type = 'single'; });
-NBB.data.otMatch.forEach(function(q){ q.subject = 'ot'; q.type = 'match'; });
-NBB.data.bsQuestions.forEach(function(q){ q.subject = 'bs'; q.type = 'single'; });
-NBB.data.bsMatch.forEach(function(q){ q.subject = 'bs'; q.type = 'match'; });
+// ТЕГИ
+var i;
+for (i = 0; i < NBB.data.otQuestions.length; i++) {
+  NBB.data.otQuestions[i].subject = 'ot';
+  NBB.data.otQuestions[i].type = 'single';
+}
+for (i = 0; i < NBB.data.otMatch.length; i++) {
+  NBB.data.otMatch[i].subject = 'ot';
+  NBB.data.otMatch[i].type = 'match';
+}
+for (i = 0; i < NBB.data.bsQuestions.length; i++) {
+  NBB.data.bsQuestions[i].subject = 'bs';
+  NBB.data.bsQuestions[i].type = 'single';
+}
+for (i = 0; i < NBB.data.bsMatch.length; i++) {
+  NBB.data.bsMatch[i].subject = 'bs';
+  NBB.data.bsMatch[i].type = 'match';
+}
 
-NBB.data.all = NBB.data.otQuestions
+// ОБЩИЙ БАНК
+NBB.data.all = []
+  .concat(NBB.data.otQuestions)
   .concat(NBB.data.otMatch)
   .concat(NBB.data.bsQuestions)
   .concat(NBB.data.bsMatch);
 
+// ПРЕДМЕТЫ
 NBB.data.SUBJECTS = {
   ot: {
     name: "Обзор Ветхого Завета",
@@ -36,6 +53,7 @@ NBB.data.SUBJECTS = {
   }
 };
 
+// РЕЖИМЫ
 NBB.data.MODES_OT = [
   {v:"all", l:"Все темы вперемешку"},
   {v:"match", l:"🔗 Сопоставление"},
@@ -58,6 +76,7 @@ NBB.data.MODES_BS = [
   {v:"mixed", l:"Экзамен — 20 вопросов"}
 ];
 
+// КНИГИ / ГЛАВЫ
 NBB.data.BOOKS_OT = [
   "Бытие","Исход","Левит","Числа","Второзаконие",
   "Иисус Навин","Судьи","Руфь",
@@ -74,6 +93,7 @@ NBB.data.BOOKS_BS = [
   "Глава 6","Глава 7","Глава 8","Глава 9","Глава 10"
 ];
 
+// КАТЕГОРИИ
 NBB.data.CATEGORIES_OT = {
   "Пятикнижие": ["Бытие","Исход","Левит","Числа","Второзаконие"],
   "Исторические": ["Иисус Навин","Судьи","Руфь","1 Царств","2 Царств","3 Царств","4 Царств","1 Паралипоменон","2 Паралипоменон","Ездра","Неемия","Есфирь"],
@@ -92,6 +112,6 @@ NBB.data.CATEGORIES_BS = {
 
 NBB.data.LETTERS = ["А","Б","В","Г"];
 
-console.log('[constants] Загружено: ОВЗ =', NBB.data.otQuestions.length,
-            '| ОИБ =', NBB.data.bsQuestions.length,
-            '| матчей =', NBB.data.otMatch.length + NBB.data.bsMatch.length);
+console.log('[constants] УСПЕХ. Вопросов ОВЗ:', NBB.data.otQuestions.length,
+            '| ОИБ:', NBB.data.bsQuestions.length,
+            '| матчей:', NBB.data.otMatch.length + NBB.data.bsMatch.length);

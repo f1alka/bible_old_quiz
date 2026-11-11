@@ -1,6 +1,6 @@
 window.NBB = window.NBB || {};
 
-// Ловим ошибки загрузки <script> — покажет имя файла в баннере
+// Ловим ошибки загрузки <script>
 window.addEventListener('error', function(e){
   if (e.target && e.target.tagName === 'SCRIPT'){
     var src = e.target.src || e.target.getAttribute('src') || '?';
@@ -12,55 +12,58 @@ window.addEventListener('error', function(e){
   }
 }, true);
 
-function validateSetup(){
-  var errors = [];
-  var fileMap = {
-    'otQuestions': 'js/data/ot-questions.js',
-    'otMatch':     'js/data/ot-match.js',
-    'bsQuestions': 'js/data/bs-questions.js',
-    'bsMatch':     'js/data/bs-match.js',
-    'all':         'js/data/constants.js (строка: NBB.data.all = ...)',
-    'SUBJECTS':    'js/data/constants.js (строка: NBB.data.SUBJECTS = ...)',
-    'BOOKS_OT':    'js/data/constants.js (строка: NBB.data.BOOKS_OT = ...)',
-    'BOOKS_BS':    'js/data/constants.js (строка: NBB.data.BOOKS_BS = ...)',
-    'MODES_OT':    'js/data/constants.js (строка: NBB.data.MODES_OT = ...)',
-    'MODES_BS':    'js/data/constants.js (строка: NBB.data.MODES_BS = ...)'
-  };
-
-  if (!window.NBB) errors.push('window.NBB отсутствует');
-  if (!NBB.data){
-    errors.push('NBB.data отсутствует → js/data/constants.js не выполнился');
-  } else {
-    for (var key in fileMap){
-      if (typeof NBB.data[key] === 'undefined'){
-        errors.push('NBB.data.' + key + ' отсутствует → проверьте ' + fileMap[key]);
-      }
-    }
-  }
-  if (!NBB.state) errors.push('NBB.state отсутствует → js/state.js');
-  else if (!NBB.state.progress) errors.push('NBB.state.progress = null → js/progress.js (последняя строка: NBB.state.progress = NBB.progress.load();)');
-  if (!NBB.progress) errors.push('NBB.progress отсутствует → js/progress.js');
-  if (!NBB.ui) errors.push('NBB.ui отсутствует → js/ui.js');
-  else if (!NBB.ui.selectSubject) errors.push('NBB.ui.selectSubject отсутствует → js/ui.js');
-  if (!NBB.game) errors.push('NBB.game отсутствует → js/game.js');
-  else if (!NBB.game.start) errors.push('NBB.game.start отсутствует → js/game.js');
-
-  var ids = ['subjectSelect','intro','game','result','headerRight','booklist','mode','bookFilter','catButtons','backToSubject','start'];
-  ids.forEach(function(id){
-    if (!document.getElementById(id)) errors.push('DOM: #' + id + ' отсутствует в index.html');
-  });
-
-  return errors;
-}
-
+// ==== ГЛАВНАЯ ДИАГНОСТИКА ====
 (function(){
   try {
-    var errors = validateSetup();
+    var errors = [];
 
-    // Если дошли до ui.js — можно показать красивый баннер
+    // 1) Проверка скриптов на странице
+    var scripts = document.querySelectorAll('script');
+    var loadedSrcs = [];
+    scripts.forEach(function(s){
+      var src = s.src || s.getAttribute('src') || '';
+      if (src) loadedSrcs.push(src.split('/').slice(-2).join('/'));
+    });
+    console.log('[diagnostics] Подключённые скрипты:', loadedSrcs);
+
+    // 2) Проверка data-модулей
+    if (!window.NBB) errors.push('window.NBB не создан');
+    if (!NBB.data){
+      errors.push('NBB.data отсутствует → js/data/constants.js не выполнился');
+    } else {
+      var required = ['all', 'SUBJECTS', 'BOOKS_OT', 'BOOKS_BS', 'MODES_OT', 'MODES_BS', 'CATEGORIES_OT', 'CATEGORIES_BS'];
+      required.forEach(function(key){
+        if (typeof NBB.data[key] === 'undefined'){
+          errors.push('NBB.data.' + key + ' отсутствует');
+        }
+      });
+      if (NBB.data.otQuestions && NBB.data.otQuestions.length === 0){
+        errors.push('NBB.data.otQuestions пустой (массив = 0) → js/data/ot-questions.js мог не выполниться');
+      }
+      if (NBB.data.bsQuestions && NBB.data.bsQuestions.length === 0){
+        errors.push('NBB.data.bsQuestions пустой → js/data/bs-questions.js мог не выполниться');
+      }
+    }
+
+    // 3) Проверка state, progress, ui, game
+    if (!NBB.state) errors.push('NBB.state отсутствует → js/state.js');
+    else if (!NBB.state.progress) errors.push('NBB.state.progress = null → js/progress.js');
+    if (!NBB.progress) errors.push('NBB.progress отсутствует → js/progress.js');
+    if (!NBB.ui) errors.push('NBB.ui отсутствует → js/ui.js');
+    else if (!NBB.ui.selectSubject) errors.push('NBB.ui.selectSubject отсутствует');
+    if (!NBB.game) errors.push('NBB.game отсутствует → js/game.js');
+    else if (!NBB.game.start) errors.push('NBB.game.start отсутствует');
+
+    // 4) Проверка DOM
+    var ids = ['subjectSelect','intro','game','result','headerRight','booklist','mode','bookFilter','catButtons','backToSubject','start'];
+    ids.forEach(function(id){
+      if (!document.getElementById(id)) errors.push('DOM: #' + id + ' отсутствует в index.html');
+    });
+
+    // ==== ВЫВОД ====
     if (errors.length){
-      console.error('[Тренажёр НББС] Ошибки:');
-      errors.forEach(function(e){ console.error(' •', e); });
+      console.error('[Тренажёр НББС] ОШИБКИ:');
+      errors.forEach(function(e){ console.error('  •', e); });
       if (NBB.ui && NBB.ui.showFatalError){
         NBB.ui.showFatalError(errors.join(' | '));
       } else {
@@ -69,7 +72,8 @@ function validateSetup(){
       return;
     }
 
-    console.log('[Тренажёр НББС] Все файлы загружены. ОВЗ:', NBB.data.otQuestions.length,
+    // ==== ВСЁ ОК, НАВЕШИВАЕМ ОБРАБОТЧИКИ ====
+    console.log('[Тренажёр НББС] Все модули загружены. ОВЗ:', NBB.data.otQuestions.length,
                 '| ОИБ:', NBB.data.bsQuestions.length,
                 '| матчей:', NBB.data.otMatch.length + NBB.data.bsMatch.length);
 
@@ -106,7 +110,7 @@ function validateSetup(){
     NBB.ui.updateHeader();
     console.log('[Тренажёр НББС] Инициализация успешна.');
   } catch(e){
-    console.error('[Тренажёр НББС] Критическая ошибка:', e);
+    console.error('[Тренажёр НББС] КРИТИЧЕСКАЯ ОШИБКА:', e);
     if (NBB.ui && NBB.ui.showFatalError){
       NBB.ui.showFatalError('Критическая ошибка: ' + e.message);
     } else {
