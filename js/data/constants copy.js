@@ -1,7 +1,7 @@
 window.NBB = window.NBB || {};
 window.NBB.data = window.NBB.data || {};
 
-// Защита от отсутствующих файлов
+// Защита от отсутствующих файлов данных
 if (!NBB.data.otQuestions) { console.warn('ot-questions.js не загружен'); NBB.data.otQuestions = []; }
 if (!NBB.data.otMatch)     { console.warn('ot-match.js не загружен');     NBB.data.otMatch = []; }
 if (!NBB.data.bsQuestions) { console.warn('bs-questions.js не загружен'); NBB.data.bsQuestions = []; }
@@ -112,6 +112,6 @@ NBB.data.CATEGORIES_BS = {
 
 NBB.data.LETTERS = ["А","Б","В","Г"];
 
-console.log('[constants] УСПЕХ. Вопросов ОВЗ:', NBB.data.otQuestions.length,
+console.log('[constants] УСПЕХ. ОВЗ:', NBB.data.otQuestions.length,
             '| ОИБ:', NBB.data.bsQuestions.length,
             '| матчей:', NBB.data.otMatch.length + NBB.data.bsMatch.length);
